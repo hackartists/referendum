@@ -17,6 +17,7 @@ pub struct UserService {
     pub nickname: Signal<String>,
     pub profile_url: Signal<String>,
     pub principal: Signal<String>,
+    pub role: Signal<UserRole>,
 }
 
 impl UserService {
@@ -30,7 +31,12 @@ impl UserService {
             nickname: Signal::new("".to_string()),
             profile_url: Signal::new("".to_string()),
             principal: Signal::new("".to_string()),
+            role: Signal::new(UserRole::Guest),
         });
+    }
+
+    pub fn role(&self) -> UserRole {
+        (self.role)()
     }
 
     pub fn logout(&mut self) {

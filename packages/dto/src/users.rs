@@ -32,13 +32,15 @@ pub struct User {
     pub role: UserRole,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default, Eq, PartialEq)]
 #[cfg_attr(feature = "server", derive(schemars::JsonSchema, aide::OperationIo))]
 #[serde(rename_all = "snake_case")]
 pub enum UserRole {
     Admin = 0,
     #[default]
     User = 1,
+    // It means the user is not signed in web page.
+    Guest = 10,
 }
 
 impl TryFrom<i32> for UserRole {

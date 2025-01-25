@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use super::i18n::*;
-use crate::route::*;
+use crate::{route::*, services::user_service::UserService};
 use dioxus::prelude::*;
 use dioxus_translate::*;
+use dto::*;
 
 #[component]
 pub fn Menus(
@@ -11,6 +12,7 @@ pub fn Menus(
     lang: Language,
 ) -> Element {
     let tr: MenusTranslate = translate(&lang);
+    let user: UserService = use_context();
 
     rsx! {
         div { id, class,
@@ -19,7 +21,9 @@ pub fn Menus(
                 ScrollLink { "{tr.about}" }
                 ScrollLink { "{tr.contact_us}" }
 
-                MenuItem { to: Route::TopicsPage { lang }, "{tr.topic}" }
+                if user.role() == UserRole::Admin {
+                    MenuItem { to: Route::TopicsPage { lang }, "{tr.topic}" }
+                }
             }
         }
     }
