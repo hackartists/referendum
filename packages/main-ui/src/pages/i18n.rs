@@ -153,16 +153,16 @@ translate! {
         ko: "HOME",
         en: "HOME",
     },
-    topics: {
-        ko: "TOPICS",
-        en: "TOPICS",
+    about: {
+        ko: "ABOUT",
+        en: "ABOUT",
     },
-    politicians: {
-        ko: "POLITICIAN STATUS",
-        en: "POLITICIAN STATUS",
+    contact_us: {
+        ko: "CONTACT US",
+        en: "CONTACT US",
     },
-    patrons: {
-        ko: "PATRONS",
-        en: "PATRONS",
+    topic: {
+        ko: "TOPIC",
+        en: "TOPIC",
     },
 }

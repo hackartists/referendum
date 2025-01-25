@@ -15,8 +15,11 @@ pub fn Menus(
     rsx! {
         div { id, class,
             div { class: "flex flex-row rounded-full bg-[#323342]",
-                MenuItem { to: Route::HomePage { lang }, "{tr.home}" }
-                MenuItem { to: Route::TopicsPage { lang }, "{tr.topics}" }
+                ScrollLink { "{tr.home}" }
+                ScrollLink { "{tr.about}" }
+                ScrollLink { "{tr.contact_us}" }
+
+                MenuItem { to: Route::TopicsPage { lang }, "{tr.topic}" }
             }
         }
     }
@@ -30,5 +33,25 @@ pub fn MenuItem(#[props(into)] to: NavigationTarget, children: Element) -> Eleme
             to,
             {children}
         }
+    }
+}
+
+#[component]
+pub fn ScrollLink(children: Element) -> Element {
+    rsx! {
+        div { class: "px-[10px] py-[5px] text-[15px] font-light leading-[22.5px] text-[#adbcd7] hover:text-white hover:bg-[#424563] rounded-full cursor-pointer",
+            {children}
+
+        }
+    }
+}
+
+#[component]
+pub fn Test(
+    #[props(default ="test".to_string())] id: String,
+    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
+) -> Element {
+    rsx! {
+        div { id, ..attributes, "Test" }
     }
 }

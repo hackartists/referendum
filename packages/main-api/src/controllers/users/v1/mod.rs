@@ -33,12 +33,12 @@ impl UserControllerV1 {
         Extension(sig): Extension<Option<Signature>>,
         Json(body): Json<UserAction>,
     ) -> Result<Json<User>> {
-        tracing::debug!("act_user: sig={:?} {:?}", sig, body);
-        let sig = sig.ok_or(ServiceError::Unauthorized)?;
+        tracing::debug!("act_user: {:?}", body);
+        // let sig = sig.ok_or(ServiceError::Unauthorized)?;
         body.validate()?;
 
         match body {
-            UserAction::Signup(req) => ctrl.signup(req, sig).await,
+            UserAction::Signup(req) => ctrl.signup(req).await,
         }
     }
 
@@ -47,10 +47,10 @@ impl UserControllerV1 {
         State(ctrl): State<UserControllerV1>,
         Extension(sig): Extension<Option<Signature>>,
 
-        Query(mut req): Query<UserReadAction>,
+        Query(req): Query<UserReadAction>,
     ) -> Result<Json<User>> {
         tracing::debug!("read_user: sig={:?}", sig);
-        let principal = sig
+        let _principal = sig
             .ok_or(ServiceError::Unauthorized)?
             .principal()
             .map_err(|s| {
@@ -61,15 +61,9 @@ impl UserControllerV1 {
 
         match req.action {
             Some(UserReadActionType::CheckEmail) => ctrl.check_email(req).await,
-            Some(UserReadActionType::UserInfo) => {
-                req.principal = Some(principal);
-                ctrl.user_info(req).await
-            }
-            Some(UserReadActionType::Login) => {
-                req.principal = Some(principal);
-                ctrl.login(req).await
-            }
-            None | Some(UserReadActionType::ByPrincipal) => Err(ServiceError::BadRequest)?,
+            Some(UserReadActionType::UserInfo) => ctrl.user_info(req).await,
+            Some(UserReadActionType::Login) => ctrl.login(req).await,
+            None => Err(ServiceError::BadRequest)?,
         }
     }
 }
@@ -83,15 +77,15 @@ impl UserControllerV1 {
     }
 
     #[instrument]
-    pub async fn signup(&self, req: UserSignupRequest, sig: Signature) -> Result<Json<User>> {
-        let principal = sig.principal().map_err(|s| {
-            tracing::error!("failed to get principal: {:?}", s);
-            ServiceError::Unauthorized
-        })?;
+    pub async fn signup(&self, req: UserSignupRequest) -> Result<Json<User>> {
+        // let principal = sig.principal().map_err(|s| {
+        //     tracing::error!("failed to get principal: {:?}", s);
+        //     ServiceError::Unauthorized
+        // })?;
 
         let user = self
             .users
-            .insert(req.nickname, principal, req.email, req.profile_url)
+            .insert(req.nickname, req.email, req.profile_url, UserRole::User)
             .await?;
 
         Ok(Json(user))
