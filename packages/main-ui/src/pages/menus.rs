@@ -17,13 +17,6 @@ pub fn Menus(
             div { class: "flex flex-row rounded-full bg-[#323342]",
                 MenuItem { to: Route::HomePage { lang }, "{tr.home}" }
                 MenuItem { to: Route::TopicsPage { lang }, "{tr.topics}" }
-                MenuItem {
-                    to: Route::PoliticianStatusPage {
-                        lang,
-                    },
-                    "{tr.politicians}"
-                }
-                MenuItem { to: Route::PatronsPage { lang }, "{tr.patrons}" }
             }
         }
     }

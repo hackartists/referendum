@@ -9,13 +9,13 @@ use lazy_static::lazy_static;
 use validator::ValidationError;
 
 #[derive(validator::Validate)]
-#[api_model(base = "/users/v1", read_action = user_info, table = users, iter_type=Vec)]
+#[api_model(base = "/users/v1", read_action = user_info, table = users, iter_type=QueryResponse)]
 pub struct User {
     #[api_model(primary_key)]
     pub id: String,
-    #[api_model(type = TIMESTAMP, auto = insert)]
+    #[api_model(auto = insert)]
     pub created_at: u64,
-    #[api_model(type = TIMESTAMP, auto = [insert, update])]
+    #[api_model(auto = [insert, update])]
     pub updated_at: u64,
 
     #[api_model(action = signup)]

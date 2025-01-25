@@ -23,6 +23,7 @@ impl Error for ServiceException {}
 #[derive(Debug, Serialize, PartialEq, Eq, Deserialize)]
 #[repr(u64)]
 #[cfg_attr(feature = "server", derive(JsonSchema, aide::OperationIo))]
+#[serde(rename_all = "snake_case")]
 pub enum ServiceError {
     Unknown(String),
 
@@ -69,9 +70,6 @@ impl ServiceError {
         format!("{:?}", self)
     }
 }
-
-unsafe impl Send for ServiceError {}
-unsafe impl Sync for ServiceError {}
 
 #[cfg(feature = "server")]
 impl by_axum::axum::response::IntoResponse for ServiceError {

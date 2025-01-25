@@ -1,5 +1,5 @@
-ENV ?= dev
-BASE_DOMAIN ?= democrasee.me
+ENV ?= local
+BASE_DOMAIN ?= biyard.co
 DOMAIN ?= $(ENV).$(BASE_DOMAIN)
 
 PROJECT ?= $(shell basename `git rev-parse --show-toplevel`)
@@ -59,7 +59,7 @@ deploy-web: build cdk-deploy s3-deploy
 .PHONY: build
 build: clean
 	mkdir -p .build
-	cd packages/$(SERVICE) && ENV=$(ENV) ARTIFACT_DIR=$(PWD)/.build/$(SERVICE) make build$(DOCKER_COMMAND_SUFFUIX)
+	cd packages/$(SERVICE) && ENV=$(ENV) ARTIFACT_DIR=$(PWD)/.build/$(SERVICE) make build
 
 fixtures/cdk/node_modules:
 	cd fixtures/cdk && npm install
@@ -73,3 +73,7 @@ s3-deploy:
 	cp -r packages/$(SERVICE)/public/* .build/$(SERVICE)/public
 	aws s3 sync .build/$(SERVICE)/public s3://$(DOMAIN) $(AWS_FLAG)
 	aws cloudfront create-invalidation --distribution-id $(CDN_ID) --paths "/*" $(AWS_FLAG) > /dev/null
+
+.PHONY: postgres
+postgres:
+	docker-compose up -d

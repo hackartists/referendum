@@ -33,14 +33,9 @@ pub fn HighlightedTopics(
                     if i == selected() {
                         HighlightedTopic {
                             id: "highlighted-topic-{topic.id.clone()}",
-                            image: topic.images[0].clone(),
                             title: topic.title.clone(),
-                            description: topic.content.clone(),
                             period: topic.period(),
-                            donations: topic.donations(),
-                            replies: topic.replies,
-                            yes: topic.number_of_yes(),
-                            no: topic.number_of_no(),
+                            yes: topic.voters,
                             lang: lang.clone(),
                         }
                     }
@@ -76,15 +71,10 @@ enum DraftChoice {
 #[component]
 pub fn HighlightedTopic(
     id: String,
-    image: String,
     title: String,
 
-    description: String,
     period: String,
-    donations: u64,
-    replies: u64,
     yes: u64,
-    no: u64,
     lang: Language,
 ) -> Element {
     let theme: Theme = use_context();
@@ -94,16 +84,6 @@ pub fn HighlightedTopic(
         div {
             id,
             class: "w-full grid grid-cols-12 grid-rows-11 gap-x-[20px] max-[800px]:gap-x-[0px] gap-y-[40px] h-[496px] max-[500px]:h-auto relative",
-            img {
-                src: image,
-                class: format!(
-                    "transition-all row-start-2 row-span-8 {} col-start-1 col-end-5 w-full h-full rounded-[8px] z-[10] object-cover",
-                    match draft_choice() {
-                        Some(_) => "ml-[24px] max-[550px]:hidden",
-                        _ => "max-[550px]:hidden max-[1000px]:col-end-6",
-                    },
-                ),
-            }
             div {
                 class: format!(
                     "transition-all col-start-6 {} col-span-6 row-end-10 flex flex-col justify-start items-start z-[10] gap-[34px]",
@@ -123,12 +103,6 @@ pub fn HighlightedTopic(
                     }
                     DescriptionWrapper { title, lang }
                     VoteResultHorizontalBars { class: "w-full", yes, no }
-                    DonationSelector {
-                        class: "w-full h-[54px]",
-                        onselect: |donation| {
-                            tracing::debug!("select donation : {donation}");
-                        },
-                    }
                 } else {
                     ContentWrapper {
                         title,
@@ -349,12 +323,11 @@ pub fn VoteResultBars(
 #[component]
 pub fn VoteResultHorizontalBars(
     yes: u64,
-    no: u64,
+    requirement: u64,
     #[props(default = "w-[580px]".to_string())] class: String,
 ) -> Element {
-    let sum = yes + no;
-    let yes = (yes as f64 / sum as f64) * 100.0;
-    let no = (no as f64 / sum as f64) * 100.0;
+    // FIXME: calculate by required
+    let yes = 78;
     let theme_service: Theme = use_context();
     let theme = theme_service.get_data();
 
@@ -369,14 +342,6 @@ pub fn VoteResultHorizontalBars(
                 }
             }
 
-            div { class: "w-[{no}%]",
-                div {
-                    class: "relative animate-grow flex flex-row justify-end items-center px-[20px] text-[15px] font-bold w-[calc(50%-6px)] h-[28px] rounded-[6px]",
-                    style: "background: linear-gradient(90deg, {theme.primary05} 0%, rgba(255, 90, 93, 0.5) 100%);",
-                    div { class: "absolute z-[20] h-[22px] w-[22px] right-[2.46px] top-[3px] rounded-[6px] bg-[{theme.active01}] opacity-50" }
-                    span { class: "z-[30]", "{no}%" }
-                }
-            }
         }
     }
 }

@@ -1,3 +1,116 @@
+use dioxus::prelude::*;
+
+#[derive(Debug, Clone)]
+pub struct ColorTheme {
+    pub backgounrd: String,
+    pub icon: IconColorTheme,
+    pub button: ButtonColorTheme,
+    pub text: TextColorTheme,
+    pub card: CardColorTheme,
+    pub popup: PopupColorTheme,
+    pub input: InputColorTheme,
+}
+
+impl Default for ColorTheme {
+    fn default() -> Self {
+        ColorTheme {
+            backgounrd: "#2C2E42".to_string(),
+            icon: IconColorTheme::default(),
+            button: ButtonColorTheme::default(),
+            text: TextColorTheme::default(),
+            card: CardColorTheme::default(),
+            popup: PopupColorTheme::default(),
+            input: InputColorTheme::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct IconColorTheme {
+    pub primary: String,
+}
+
+impl Default for IconColorTheme {
+    fn default() -> Self {
+        IconColorTheme {
+            primary: "#B0BEC5".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ButtonColorTheme {
+    pub primary: String,
+    pub secondary: String,
+}
+
+impl Default for ButtonColorTheme {
+    fn default() -> Self {
+        ButtonColorTheme {
+            primary: "#363952".to_string(),
+            secondary: "#424563".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TextColorTheme {
+    pub primary: String,
+    pub secondary: String,
+    pub disabled: String,
+}
+
+impl Default for TextColorTheme {
+    fn default() -> Self {
+        TextColorTheme {
+            primary: "#FFFFFF".to_string(),
+            secondary: "#ADBCD7".to_string(),
+            disabled: "#404761".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CardColorTheme {
+    pub primary: String,
+    pub secondary: String,
+}
+
+impl Default for CardColorTheme {
+    fn default() -> Self {
+        CardColorTheme {
+            primary: "#212231".to_string(),
+            secondary: "#292B3D".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PopupColorTheme {
+    pub background: String,
+}
+
+impl Default for PopupColorTheme {
+    fn default() -> Self {
+        PopupColorTheme {
+            background: "#2E3045".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct InputColorTheme {
+    pub primary: String,
+}
+
+impl Default for InputColorTheme {
+    fn default() -> Self {
+        InputColorTheme {
+            primary: "#212231".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ThemeData {
     pub active: String,
@@ -53,25 +166,29 @@ impl Default for ThemeData {
             primary11: "#292B3C".to_string(), // bg-[#292B3C] text-[#292B3C] border-[#292B3C]
             primary100: "#B5AB65".to_string(), // bg-[#B5AB65] text-[#B5AB65] border-[#B5AB65]
             grey00: "#FFFFFF".to_string(), // bg-[#FFFFFF] text-[#FFFFFF] border-[#FFFFFF]
-            hover: "#323342".to_string(), // bg-[#323342] text-[#323342] border-[#323342]
+            hover: "#323342".to_string(),  // bg-[#323342] text-[#323342] border-[#323342]
             highlight: "#C0B086".to_string(), // bg-[#C0B086] text-[#C0B086] border-[#C0B086]
             font_theme: FontTheme::default(),
         }
     }
 }
 
-use dioxus::prelude::*;
-
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Theme {
     pub data: Signal<ThemeData>,
+    pub color: Signal<ColorTheme>,
 }
 
 impl Theme {
     pub fn init() {
         use_context_provider(|| Self {
             data: Signal::new(ThemeData::default()),
+            color: Signal::new(ColorTheme::default()),
         });
+    }
+
+    pub fn color(&self) -> ColorTheme {
+        (self.color)()
     }
 
     pub fn get_data(&self) -> ThemeData {

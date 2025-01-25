@@ -3,32 +3,29 @@ VERSION ?= $(shell toml get Cargo.toml package.version | tr -d \")
 COMMIT ?= $(shell git rev-parse --short HEAD)
 ENV ?= local
 
-ACCESS_KEY_ID ?= $(shell aws configure get aws_access_key_id $(AWS_FLAG))
-SECRET_ACCESS_KEY ?= $(shell aws configure get aws_secret_access_key $(AWS_FLAG))
-REGION ?= $(shell aws configure get region)
-
 ifeq ("$(ENV)","prod")
 	RUST_LOG ?= info
-	DOMAIN ?= democrasee.me
-	REDIRECT_URI = https://democrasee.me
-	MAIN_API_ENDPOINT ?= https://api.democrasee.me
+	DOMAIN ?= ""
+	REDIRECT_URI = ""
+	MAIN_API_ENDPOINT ?= ""
 endif
 
 ifeq ("$(ENV)","dev")
-	REDIRECT_URI = https://dev.democrasee.me
+	REDIRECT_URI = ""
 endif
 
-DOMAIN ?= dev.democrasee.me
+DOMAIN ?= localhost
 RUST_LOG ?= debug
-REDIRECT_URI ?= http://localhost:3000
+REDIRECT_URI ?= http://localhost:8080
 WORKSPACE_ROOT ?= ../..
-MAIN_API_ENDPOINT ?= https://api.dev.democrasee.me
+MAIN_API_ENDPOINT ?= http://localhost:3000
 
-BUILD_ENV ?= ENV=$(ENV) VERSION=$(VERSION) COMMIT=$(COMMIT) RUST_LOG=$(RUST_LOG) ENV=$(ENV) DOMAIN=${DOMAIN} AWS_REGION=${REGION} AWS_ACCESS_KEY_ID=${ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${SECRET_ACCESS_KEY} SERVICE=$(SERVICE) WORKSPACE_ROOT=$(WORKSPACE_ROOT) BASE_URL=$(BASE_URL) MAIN_API_ENDPOINT=$(MAIN_API_ENDPOINT) REDIRECT_URI=$(REDIRECT_URI)
+BUILD_ENV ?= ENV=$(ENV) VERSION=$(VERSION) COMMIT=$(COMMIT) RUST_LOG=$(RUST_LOG) ENV=$(ENV) DOMAIN=${DOMAIN} SERVICE=$(SERVICE) BASE_URL=$(BASE_URL) MAIN_API_ENDPOINT=$(MAIN_API_ENDPOINT) REDIRECT_URI=$(REDIRECT_URI)
 
 setup.tool:
-	cargo install dioxus-cli --version 0.6.1
-	cargo install toml-cli
+	cargo install cargo-binstall
+	cargo binstall dioxus-cli --version 0.6.1
+	cargo binstall toml-cli
 	npm i -g tailwindcss
 
 serve: clean public/tailwind.css

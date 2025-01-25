@@ -76,6 +76,5 @@ jobs:
           SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ENV: dev
           SERVICE: main-api
-          DOMAIN: api.dev.democrasee.me
         run: |
           make build

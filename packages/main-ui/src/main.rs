@@ -8,7 +8,7 @@ pub mod theme;
 use dioxus::prelude::*;
 use dioxus_popup::PopupService;
 use route::Route;
-use services::{politician_service::PoliticianService, user_service::UserService};
+use services::user_service::UserService;
 use theme::Theme;
 
 fn main() {
@@ -24,22 +24,21 @@ fn app() -> Element {
     Theme::init();
     UserService::init();
     PopupService::init();
-    PoliticianService::init();
 
     rsx! {
-        document::Title { "DemocraSee" }
-        document::Meta {
-            name: "title",
-            content: "Driving Better Crypto Policies for South Korea's Ecosystem",
-        }
-        document::Meta {
-            name: "description",
-            content: "A platform empowering South Korea's crypto ecosystem by encouraging politicians to create supportive policies. Track their crypto stances, vote on legislation, propose DAO-driven improvements, and shape a thriving future for the industry and democracy.",
-        }
+        document::Title { "국민투표" }
+        document::Meta { name: "title", content: "" }
+        document::Meta { name: "description", content: "" }
         document::Meta {
             name: "viewport",
             content: "width=device-width, initial-scale=1.0",
         }
+
+        document::Meta {
+            name: "keywords",
+            content: "SEO, meta tags, search engine optimization",
+        }
+
         document::Link { id: "favicon", rel: "icon", href: asset!("/public/favicon.ico") }
         document::Link { rel: "stylesheet", href: asset!("/public/main.css") }
         document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css") }
