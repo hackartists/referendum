@@ -29,13 +29,16 @@ pub enum ServiceError {
 
     NotFound,
     Unauthorized,
+    NoIdToken(String),
     UserAlreadyExists,
 
     VerifyException(String),
     SignException,
     DatabaseException(String),
     OpenApiResponseError(String),
-    BadRequest,
+    BadRequest(String),
+    NoReadActionType,
+    NoKakaoId,
     JsonDeserializeError(String),
 }
 

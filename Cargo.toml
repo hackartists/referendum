@@ -24,9 +24,10 @@ reqwest = { version = "0.12.5", features = ["blocking", "json", "multipart"] }
 dioxus = { version = "0.6.1" }
 sqlx = { version = "0.8.3", features = ["sqlite", "postgres", "runtime-tokio", "time"] }
 dioxus-translate = { path = "./deps/rust-sdk/packages/dioxus-translate", features = ["ko"] }
-dioxus-oauth = { path = "./deps/rust-sdk/packages/dioxus-oauth", features = ["web"] }
+dioxus-oauth = { path = "./deps/rust-sdk/packages/dioxus-oauth" }
 google-wallet = { path = "./deps/rust-sdk/packages/google-wallet" }
 dioxus-popup = { path = "./deps/rust-sdk/packages/dioxus-popup" }
+by-components = { path = "./deps/rust-sdk/packages/by-components" }
 
 
 [profile.wasm-dev]

@@ -1,5 +1,5 @@
 pub mod _routes;
-mod controller;
+pub mod controller;
 mod i18n;
 pub mod page;
 mod topics;

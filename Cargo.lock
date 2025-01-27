@@ -934,7 +934,7 @@ checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
 name = "by-axum"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "aide",
  "axum 0.8.1",
@@ -960,8 +960,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "by-components"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "tracing",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "by-macros"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
  "convert_case 0.7.1",
  "indexmap 2.7.1",
@@ -977,7 +988,7 @@ dependencies = [
 
 [[package]]
 name = "by-types"
-version = "0.3.2"
+version = "0.3.4"
 dependencies = [
  "aide",
  "axum 0.8.1",
@@ -985,6 +996,7 @@ dependencies = [
  "schemars",
  "serde",
  "sqlx",
+ "tracing",
  "validator",
 ]
 
@@ -2970,21 +2982,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gloo-storage"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fbc8031e8c92758af912f9bc08fbbadd3c6f3cfcbf6b64cdf3d6a81f0139277a"
-dependencies = [
- "gloo-utils",
- "js-sys",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "gloo-utils"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3006,24 +3003,6 @@ dependencies = [
  "glib-sys",
  "libc",
  "system-deps",
-]
-
-[[package]]
-name = "google-wallet"
-version = "0.1.1"
-dependencies = [
- "base64 0.22.1",
- "candid",
- "dioxus",
- "dioxus-oauth",
- "gloo-storage",
- "reqwest",
- "ring",
- "serde",
- "serde_json",
- "sha2",
- "simple_asn1",
- "tracing",
 ]
 
 [[package]]
@@ -3758,6 +3737,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonwebtoken"
+version = "9.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9ae10193d25051e74945f1ea2d0b42e03cc3b890f7e4cc5faa44997d808193f"
+dependencies = [
+ "base64 0.21.7",
+ "js-sys",
+ "pem",
+ "ring",
+ "serde",
+ "serde_json",
+ "simple_asn1",
+]
+
+[[package]]
 name = "keyboard-types"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4075,10 +4069,13 @@ dependencies = [
  "by-axum",
  "by-types",
  "chrono",
+ "dioxus-oauth",
  "dto",
  "easy-dynamodb",
+ "jsonwebtoken",
  "reqwest",
  "rest-api",
+ "schemars",
  "serde",
  "serde_json",
  "slog",
@@ -4096,6 +4093,7 @@ name = "main-ui"
 version = "0.7.4"
 dependencies = [
  "base64 0.22.1",
+ "by-components",
  "by-macros",
  "by-types",
  "chrono",
@@ -4108,7 +4106,7 @@ dependencies = [
  "dioxus-translate",
  "dioxus-web",
  "dto",
- "google-wallet",
+ "jsonwebtoken",
  "num-format",
  "reqwest",
  "rest-api",
@@ -4784,6 +4782,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
+name = "pem"
+version = "3.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e459365e590736a54c3fa561947c84837534b8e9af6fc5bf781307e82658fae"
+dependencies = [
+ "base64 0.22.1",
+ "serde",
+]
+
+[[package]]
 name = "pem-rfc7468"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5361,7 +5369,7 @@ dependencies = [
 
 [[package]]
 name = "rest-api"
-version = "0.1.3"
+version = "0.1.5"
 dependencies = [
  "base64 0.22.1",
  "candid",

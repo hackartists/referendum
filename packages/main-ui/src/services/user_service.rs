@@ -5,7 +5,7 @@ use dto::*;
 use crate::config;
 
 pub enum UserEvent {
-    Signup(String, String, String, String),
+    Signup,
     Login,
     Logout,
 }
@@ -16,23 +16,24 @@ pub struct UserService {
     pub email: Signal<String>,
     pub nickname: Signal<String>,
     pub profile_url: Signal<String>,
-    pub principal: Signal<String>,
     pub role: Signal<UserRole>,
+    pub id_token: Signal<Option<String>>,
 }
 
 impl UserService {
     pub fn init() {
         let conf = config::get();
         let cli = User::get_client(&conf.main_api_endpoint);
-
-        use_context_provider(|| Self {
+        let srv = Self {
             cli: Signal::new(cli),
             email: Signal::new("".to_string()),
             nickname: Signal::new("".to_string()),
             profile_url: Signal::new("".to_string()),
-            principal: Signal::new("".to_string()),
             role: Signal::new(UserRole::Guest),
-        });
+            id_token: Signal::new(None),
+        };
+        rest_api::add_hook(srv);
+        use_context_provider(|| srv);
     }
 
     pub fn role(&self) -> UserRole {
@@ -43,7 +44,7 @@ impl UserService {
         self.email.set("".to_string());
         self.nickname.set("".to_string());
         self.profile_url.set("".to_string());
-        self.principal.set("".to_string());
+        self.role.set(UserRole::Guest);
     }
 
     pub async fn get_user_info_from_server(&mut self) {
@@ -77,22 +78,26 @@ impl UserService {
         Some((nickname, profile_url))
     }
 
-    pub async fn login(&mut self) -> UserEvent {
+    pub async fn login(&mut self, id_token: String, kakao_id: String) -> UserEvent {
         tracing::debug!("UserService::login");
+        self.id_token.set(Some(id_token));
 
-        UserEvent::Logout
+        let cli = (self.cli)();
+        match cli.login(kakao_id).await {
+            Ok(user) => {
+                self.email.set(user.email);
+                self.nickname.set(user.nickname);
+                self.profile_url.set(user.profile_url);
+                self.role.set(user.role);
+                UserEvent::Login
+            }
+            Err(_) => UserEvent::Signup,
+        }
     }
 
-    pub async fn login_or_signup(
-        &self,
-        principal: &str,
-        email: &str,
-        nickname: &str,
-        profile_url: &str,
-    ) -> Result<()> {
+    pub async fn signup(&mut self, email: &str, nickname: &str, profile_url: &str) -> Result<()> {
         tracing::debug!(
-            "UserService::signup: principal={} email={} nickname={} profile_url={}",
-            principal,
+            "UserService::signup: email={} nickname={} profile_url={}",
             email,
             nickname,
             profile_url
@@ -100,7 +105,7 @@ impl UserService {
 
         let cli = (self.cli)();
 
-        let res: User = match cli
+        match cli
             .signup(
                 nickname.to_string(),
                 email.to_string(),
@@ -108,15 +113,31 @@ impl UserService {
             )
             .await
         {
-            Ok(v) => v,
+            Ok(v) => {
+                self.email.set(v.email);
+                self.nickname.set(v.nickname);
+                self.profile_url.set(v.profile_url);
+                self.role.set(v.role);
+            }
             Err(e) => {
                 tracing::error!("UserService::signup: error={:?}", e);
-                rest_api::remove_signer();
-                return Err(e);
+                self.id_token.set(None);
+                Err(e)?;
             }
         };
 
-        tracing::debug!("UserService::signup: user={:?}", res);
         Ok(())
+    }
+}
+
+impl rest_api::RequestHooker for UserService {
+    fn before_request(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
+        let id_token = (self.id_token)();
+
+        if let Some(id_token) = id_token {
+            req.header("x-id-token".to_string(), id_token)
+        } else {
+            req
+        }
     }
 }

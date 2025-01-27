@@ -1,15 +1,17 @@
 # 국민투표
 
 ## Common Environments
-| Name     | Description                                                  |
-|----------|--------------------------------------------------------------|
-| RUST_LOG | Logging libraries based on tracing(`debug`, `info`, `error`) |
+| Name     | Description                                                                    |
+|----------|--------------------------------------------------------------------------------|
+| RUST_LOG | Logging libraries based on tracing(`debug`, `info`, `error`)                   |
+| SERVICE  | Package name to be executed. default is `main-ui`                              |
+| DOMAIN   | Base domain name (ex. dev.example.com) will be used to compose signing message |
 
 
 ## Development
 ### Running API Server
-- It runs =SERVICE= crate.
-  - Default =SERVICE= is =main-ui=.
+- It runs `SERVICE` crate.
+  - Default `SERVICE` is `main-ui`.
 
 ``` bash
 export SERVICE=main-api

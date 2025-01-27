@@ -18,7 +18,7 @@ tracing = { version = "0.1.40" }
 
 wasm-bindgen = { version = "0.2.100", optional = true }
 wasm-bindgen-futures = { version = "0.4.50", optional = true }
-web-sys = { version = "0.3.72", features=["Navigator"], optional = true}
+web-sys = { version = "0.3.72", features=["Navigator", "HtmlCollection"], optional = true}
 serde = "1.0.216"
 num-format = "0.4.4"
 
@@ -26,8 +26,7 @@ dioxus-sdk = { version = "0.6.0", features = ["window_size"], optional = true }
 
 dioxus-popup.workspace = true
 dioxus-translate.workspace = true
-dioxus-oauth = { workspace = true, optional = true }
-google-wallet = { workspace = true, optional = true }
+dioxus-oauth = { workspace = true }
 
 chrono = "0.4.39"
 base64 = "0.22.1"
@@ -35,10 +34,12 @@ url = "2.5.4"
 rest-api.workspace = true
 by-macros.workspace = true
 by-types.workspace = true
+by-components.workspace = true
+jsonwebtoken = "9.3.0"
 
 [features]
 default = []
 web = ["web-only", "dioxus-aws/web"]
-web-only = ["web-sys", "wasm-bindgen", "wasm-bindgen-futures", "dioxus-aws/web-only", "dioxus-web", "dioxus-sdk", "dioxus-oauth", "google-wallet","dioxus-translate/web"]
+web-only = ["web-sys", "wasm-bindgen", "wasm-bindgen-futures", "dioxus-aws/web-only", "dioxus-web", "dioxus-sdk", "dioxus-oauth/web", "dioxus-translate/web", "by-components/web", "rest-api/web"]
 server = ["dioxus-aws/server"]
 lambda = ["server", "dioxus-aws/lambda"]

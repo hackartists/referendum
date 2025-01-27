@@ -25,6 +25,9 @@ sqlx.workspace = true
 tracing = { version = "0.1.41" }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 validator = "0.20.0"
+dioxus-oauth.workspace = true
+schemars = "0.8.21"
+jsonwebtoken = "9.3.0"
 
 [features]
 default = []

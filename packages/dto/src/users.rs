@@ -21,7 +21,7 @@ pub struct User {
     #[api_model(action = signup)]
     #[validate(custom(function = "validate_nickname"))]
     pub nickname: String,
-    #[api_model(action = signup, read_action = [check_email, login], unique)]
+    #[api_model(action = signup, read_action = [check_email], unique)]
     #[validate(email)]
     pub email: String,
     #[api_model(action = signup)]
@@ -30,6 +30,9 @@ pub struct User {
 
     #[api_model(type = INTEGER)]
     pub role: UserRole,
+
+    #[api_model(version = v0.1, unique, action = [login], read_action = [find_by_kakao_id])]
+    pub kakao_id: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default, Eq, PartialEq)]

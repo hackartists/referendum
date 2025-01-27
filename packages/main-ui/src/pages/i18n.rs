@@ -135,14 +135,9 @@ translate! {
 translate! {
     SignupPopupTranslate;
 
-    continue_with_google: {
-        ko: "Google로 계속하기",
-        en: "Continue with Google",
-    },
-
-    quick_sign_in: {
-        ko: "간편 로그인",
-        en: "Quick Sign-in",
+    continue_with_kakao: {
+        ko: "카카오 로그인",
+        en: "Continue with Kakao",
     },
 }
 

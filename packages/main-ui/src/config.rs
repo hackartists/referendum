@@ -3,6 +3,7 @@ use tracing::Level;
 #[derive(Debug)]
 pub struct KakaoConfig {
     pub client_id: &'static str,
+    pub redirect_uri: &'static str,
 }
 
 #[derive(Debug)]
@@ -32,6 +33,10 @@ impl Default for Config {
                 .to_string(),
             kakao: KakaoConfig {
                 client_id: option_env!("KAKAO_CLIENT_ID").expect("You must set KAKAO_CLIENT_ID"),
+                redirect_uri: option_env!("KAKAO_REDIRECT_URI").unwrap_or_else(|| {
+                    tracing::warn!("You didn't set KAKAO_REDIRECT_URI and it will be set to http://localhost:8080/oauth/kakao by default");
+                    "http://localhost:8080/oauth/kakao"
+                }),
             },
         }
     }

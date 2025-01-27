@@ -12,6 +12,7 @@ impl Controller {
 
         let ctrl = Self {};
         use_context_provider(|| ctrl);
+        tracing::debug!("Controller initialized");
 
         Ok(ctrl)
     }

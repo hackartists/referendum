@@ -1,5 +1,6 @@
 use crate::pages::*;
 use dioxus::prelude::*;
+use dioxus_oauth::component::OAuthPopup;
 use dioxus_translate::Language;
 
 #[derive(Clone, Routable, Debug, PartialEq)]
@@ -19,7 +20,10 @@ pub enum Route {
         #[end_layout]
     #[end_nest]
 
-    #[redirect("/", || Route::HomePage { lang: Language::default() })]
+    #[redirect("/", || Route::HomePage { lang: Language::Ko })]
+    #[route("/oauth/kakao")]
+    OAuthPopup {},
+
     #[route("/:..route")]
     NotFoundPage { route: Vec<String> },
 }

@@ -25,7 +25,7 @@ pub fn Button(
 
     rsx! {
         div { class: "{class}",
-            div {
+            button {
                 class: "{font_theme.bold15} px-[16px] py-[10px] opacity-70 hover:opacity-100 cursor-pointer rounded-[8px]",
                 onclick: move |evt| onclick.call(evt),
                 style: match background {

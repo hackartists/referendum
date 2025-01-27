@@ -5,6 +5,7 @@ pub struct Config {
     pub env: &'static str,
     pub domain: &'static str,
     pub aws: AwsConfig,
+    pub auth: AuthConfig,
     pub database: DatabaseConfig,
 }
 
@@ -13,6 +14,7 @@ impl Default for Config {
         Config {
             env: option_env!("ENV").expect("You must set ENV"),
             domain: option_env!("DOMAIN").expect("You must set DOMAIN"),
+            auth: AuthConfig::default(),
             aws: AwsConfig::default(),
             database: DatabaseConfig::default(),
         }

@@ -1,17 +1,62 @@
-use by_axum::axum::{
-    extract::{Query, State},
-    routing::get,
-    Extension, Json,
+use std::time::SystemTime;
+
+use by_axum::{
+    aide,
+    auth::Authorization,
+    axum::{
+        extract::{Query, State},
+        http::HeaderMap,
+        response::{IntoResponse, Response},
+        routing::get,
+        Extension, Json,
+    },
 };
+use by_types::AuthConfig;
 use dto::*;
-use rest_api::Signature;
+use reqwest::header::{self, HeaderValue};
+use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 use tracing::instrument;
 use validator::Validate;
 
+#[derive(
+    Debug,
+    Clone,
+    serde::Deserialize,
+    serde::Serialize,
+    Default,
+    schemars::JsonSchema,
+    aide::OperationIo,
+)]
+pub struct UserWrapper {
+    #[serde(flatten)]
+    pub user: User,
+    pub token: String,
+}
+
+impl IntoResponse for UserWrapper {
+    fn into_response(self) -> Response {
+        let mut headers = HeaderMap::new();
+        let cookie = format!("type={}; token={};", "bearer", self.token);
+        headers.insert(header::SET_COOKIE, HeaderValue::from_str(&cookie).unwrap());
+        headers.insert(
+            header::AUTHORIZATION,
+            HeaderValue::from_str(&format!("Bearer {}", self.token)).unwrap(),
+        );
+
+        (
+            by_axum::axum::http::StatusCode::OK,
+            headers,
+            by_axum::axum::Json(self),
+        )
+            .into_response()
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct UserControllerV1 {
     users: UserRepository,
+    auth: AuthConfig,
 }
 
 impl UserControllerV1 {
@@ -20,7 +65,9 @@ impl UserControllerV1 {
 
         users.create_table().await?;
 
-        let ctrl = UserControllerV1 { users };
+        let auth = crate::config::get().auth.clone();
+
+        let ctrl = UserControllerV1 { users, auth };
 
         Ok(by_axum::axum::Router::new()
             .route("/", get(Self::read_user).post(Self::act_user))
@@ -29,66 +76,151 @@ impl UserControllerV1 {
 
     #[instrument]
     pub async fn act_user(
+        headers: HeaderMap,
         State(ctrl): State<UserControllerV1>,
-        Extension(sig): Extension<Option<Signature>>,
+        Extension(sig): Extension<Option<Authorization>>,
         Json(body): Json<UserAction>,
-    ) -> Result<Json<User>> {
+    ) -> Result<UserWrapper> {
         tracing::debug!("act_user: {:?}", body);
-        // let sig = sig.ok_or(ServiceError::Unauthorized)?;
         body.validate()?;
 
         match body {
-            UserAction::Signup(req) => ctrl.signup(req).await,
+            UserAction::Signup(req) => ctrl.signup(headers, req).await,
+            UserAction::Login(req) => ctrl.login(headers, req).await,
         }
     }
 
     #[instrument]
     pub async fn read_user(
+        headers: HeaderMap,
         State(ctrl): State<UserControllerV1>,
-        Extension(sig): Extension<Option<Signature>>,
+        Extension(sig): Extension<Option<Authorization>>,
 
         Query(req): Query<UserReadAction>,
     ) -> Result<Json<User>> {
         tracing::debug!("read_user: sig={:?}", sig);
-        let _principal = sig
-            .ok_or(ServiceError::Unauthorized)?
-            .principal()
-            .map_err(|s| {
-                tracing::error!("failed to get principal: {:?}", s);
-                ServiceError::Unknown(s.to_string())
-            })?;
         req.validate()?;
 
         match req.action {
             Some(UserReadActionType::CheckEmail) => ctrl.check_email(req).await,
             Some(UserReadActionType::UserInfo) => ctrl.user_info(req).await,
-            Some(UserReadActionType::Login) => ctrl.login(req).await,
-            None => Err(ServiceError::BadRequest)?,
+            _ => Err(ServiceError::NoReadActionType)?,
         }
     }
 }
 
-impl UserControllerV1 {
-    #[instrument]
-    pub async fn login(&self, req: UserReadAction) -> Result<Json<User>> {
-        let user = self.users.find_one(&req).await?;
+#[derive(serde::Deserialize, Debug)]
+pub struct OpenIdResponse {
+    pub sub: String,
+}
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    sub: String,
+    exp: u64,
+    role: UserRole,
+}
 
-        Ok(Json(user))
+impl UserControllerV1 {
+    pub async fn get_openid(&self, headers: &HeaderMap) -> Result<String> {
+        let id_token = headers
+            .get("x-id-token")
+            .ok_or(ServiceError::NoIdToken(
+                "you must set kakao OAuth ID token to `X-ID-TOKEN` header".to_string(),
+            ))?
+            .to_str()
+            .map_err(|s| {
+                tracing::error!("failed to get id_token: {:?}", s);
+                ServiceError::NoIdToken(
+                    "you must set kakao OAuth ID token to `X-ID-TOKEN` header".to_string(),
+                )
+            })?;
+
+        let mut params = std::collections::HashMap::new();
+        params.insert("id_token", id_token);
+
+        let client = reqwest::Client::new();
+        let res = client
+            .post("https://kauth.kakao.com/oauth/tokeninfo")
+            .form(&params)
+            .send()
+            .await?
+            .json::<OpenIdResponse>()
+            .await?;
+
+        Ok(res.sub)
     }
 
     #[instrument]
-    pub async fn signup(&self, req: UserSignupRequest) -> Result<Json<User>> {
-        // let principal = sig.principal().map_err(|s| {
-        //     tracing::error!("failed to get principal: {:?}", s);
-        //     ServiceError::Unauthorized
-        // })?;
+    pub async fn login(&self, headers: HeaderMap, req: UserLoginRequest) -> Result<UserWrapper> {
+        let kakao_id = self.get_openid(&headers).await?;
+
+        if &kakao_id != &req.kakao_id {
+            Err(ServiceError::Unauthorized)?;
+        }
+
+        let req = UserReadAction::new().find_by_kakao_id(kakao_id.clone());
 
         let user = self
             .users
-            .insert(req.nickname, req.email, req.profile_url, UserRole::User)
+            .find_one(&req)
+            .await
+            .map_err(|_| ServiceError::NotFound)?;
+
+        let token = self.generate_token(&user)?;
+
+        Ok(UserWrapper { user, token })
+    }
+
+    pub fn generate_token(&self, user: &User) -> Result<String> {
+        match &self.auth {
+            &AuthConfig::Jwt {
+                ref expiration,
+                ref secret,
+            } => {
+                let exp = SystemTime::now()
+                    .duration_since(SystemTime::UNIX_EPOCH)?
+                    .as_secs()
+                    + expiration;
+                let claims = Claims {
+                    sub: user.id.to_string(),
+                    exp,
+                    role: user.role.clone(),
+                };
+                let token = match jsonwebtoken::encode(
+                    &jsonwebtoken::Header::default(),
+                    &claims,
+                    &jsonwebtoken::EncodingKey::from_secret(secret.as_ref()),
+                ) {
+                    Ok(token) => token,
+                    Err(err) => {
+                        tracing::error!("Error creating JWT: {}", err);
+                        return Err(ServiceError::Unknown(err.to_string()));
+                    }
+                };
+
+                Ok(token)
+            }
+        }
+    }
+
+    #[instrument]
+    pub async fn signup(&self, headers: HeaderMap, req: UserSignupRequest) -> Result<UserWrapper> {
+        let kakao_id = self.get_openid(&headers).await?;
+
+        let user = self
+            .users
+            .insert(
+                req.nickname,
+                req.email,
+                req.profile_url,
+                UserRole::User,
+                kakao_id,
+            )
             .await?;
 
-        Ok(Json(user))
+        let token = self.generate_token(&user)?;
+
+        Ok(UserWrapper { user, token })
     }
 
     #[instrument]

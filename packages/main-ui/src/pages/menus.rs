@@ -43,19 +43,9 @@ pub fn MenuItem(#[props(into)] to: NavigationTarget, children: Element) -> Eleme
 #[component]
 pub fn ScrollLink(children: Element) -> Element {
     rsx! {
-        div { class: "px-[10px] py-[5px] text-[15px] font-light leading-[22.5px] text-[#adbcd7] hover:text-white hover:bg-[#424563] rounded-full cursor-pointer",
+        div { class: "hover-effect px-[10px] py-[5px] text-[15px] font-light leading-[22.5px] text-[#adbcd7] hover:text-white hover:bg-[#424563] rounded-full cursor-pointer ",
             {children}
 
         }
-    }
-}
-
-#[component]
-pub fn Test(
-    #[props(default ="test".to_string())] id: String,
-    #[props(extends = GlobalAttributes)] attributes: Vec<Attribute>,
-) -> Element {
-    rsx! {
-        div { id, ..attributes, "Test" }
     }
 }

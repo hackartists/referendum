@@ -14,14 +14,14 @@ pub fn UserSetupPopup(
     nickname: String,
     profile_url: String,
     email: String,
-    principal: String,
     lang: Language,
 ) -> Element {
     let mut popup: PopupService = use_context();
     let mut valid = use_signal(|| true);
     let mut nickname = use_signal(|| nickname.to_string());
+    let mut email = use_signal(|| email.to_string());
     let mut agreed = use_signal(|| false);
-    let user_service: UserService = use_context();
+    let mut user_service: UserService = use_context();
     let theme: Theme = use_context();
     let theme = theme.get_data();
     let btn_color = use_memo(move || {
@@ -42,22 +42,6 @@ pub fn UserSetupPopup(
                     img {
                         class: "w-[100px] h-[100px] rounded-[50%] object-contain",
                         src: "{profile_url}",
-                    }
-                }
-
-                // Email
-                if !email.is_empty() {
-                    div { class: "flex flex-col gap-[8px]",
-                        div { class: "flex flex-row items-start",
-                            span { class: "text-[14px] font-bold leading-[24px]", "이메일" }
-                        }
-                        div { class: "flex flex-col items-start w-full mt-[10px] gap-[8px]",
-                            input {
-                                class: "w-[400px] max-[400px]:w-[300px] h-[59px] px-[24px] py-[17.5px] bg-[{theme.background}] text-[18px] font-bold leading-[24px] rounded-[4px] placeholder-[{theme.primary07}] rounded-[8px] text-[{theme.primary04}]",
-                                value: "{email}",
-                                disabled: true,
-                            }
-                        }
                     }
                 }
 
@@ -86,6 +70,23 @@ pub fn UserSetupPopup(
                     }
                 }
 
+                // Email
+                div { class: "flex flex-col gap-[8px]",
+                    div { class: "flex flex-row items-start",
+                        span { class: "text-[14px] font-bold leading-[24px]", "이메일" }
+                    }
+                    div { class: "flex flex-col items-start w-full mt-[10px] gap-[8px]",
+                        input {
+                            class: "w-[400px] max-[400px]:w-[300px] h-[59px] px-[24px] py-[17.5px] bg-[{theme.background}] text-[18px] font-bold leading-[24px] rounded-[4px] placeholder-[{theme.primary07}] rounded-[8px] text-[{theme.primary04}]",
+                            value: email(),
+                            onchange: move |e| {
+                                email.set(e.value());
+                            },
+                        }
+                    }
+                }
+
+
                 div { class: "flex flex-row gap-[10px] items-center",
                     Checkbox {
                         title: "{tr.agree_email}",
@@ -105,12 +106,11 @@ pub fn UserSetupPopup(
                     onclick: move |_| {
                         if agreed() {
                             let nickname = nickname();
-                            let principal = principal.clone();
-                            let email = email.clone();
+                            let email = email();
                             let profile_url = profile_url.clone();
                             spawn(async move {
                                 if let Err(e) = user_service
-                                    .login_or_signup(&principal, &email, &nickname, &profile_url)
+                                    .signup(&email, &nickname, &profile_url)
                                     .await
                                 {
                                     match e {
