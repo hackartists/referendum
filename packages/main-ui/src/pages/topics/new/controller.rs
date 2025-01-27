@@ -1,5 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_translate::Language;
+use dto::{Topic, TopicClient};
 
 use crate::route::Route;
 
@@ -12,6 +13,7 @@ pub struct Controller {
     pub content: Signal<String>,
     pub nav: Navigator,
     pub lang: Language,
+    pub cli: Signal<TopicClient>,
 }
 
 impl Controller {
@@ -24,6 +26,7 @@ impl Controller {
             content: Signal::new("".to_string()),
             nav: use_navigator(),
             lang,
+            cli: Signal::new(Topic::get_client(&crate::config::get().main_api_endpoint)),
         };
 
         use_context_provider(|| ctrl);
@@ -74,5 +77,25 @@ impl Controller {
         }
     }
 
-    pub async fn submit(&mut self) {}
+    pub async fn submit(&mut self) {
+        let cli = (self.cli)();
+        let title = (self.title)();
+        let content = (self.content)();
+        let started_at = (self.start)();
+        let ended_at = (self.end)();
+        let requirement = (self.requirement)();
+
+        match cli
+            .create(title, content, started_at, ended_at, requirement)
+            .await
+        {
+            Ok(topic) => {
+                tracing::debug!("Created topic: {:?}", topic);
+                self.nav.replace(Route::TopicsPage { lang: self.lang });
+            }
+            Err(e) => {
+                tracing::error!("Failed to create topic: {:?}", e);
+            }
+        }
+    }
 }

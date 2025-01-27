@@ -11,28 +11,8 @@ translate! {
         ko: "토픽 생성",
         en: "Create a topic",
     },
-}
-
-translate! {
-    TopicsCardTranslate;
-
-    yes: {
-        ko: "찬성",
-        en: "Yes",
+    unit: {
+        ko: "명",
+        en: "people",
     },
-
-    no: {
-        ko: "반대",
-        en: "No",
-    },
-
-    vol: {
-        ko: "누적액",
-        en: "Vol.",
-    },
-
-    currency: {
-        ko: "ETH",
-        en: "ETH",
-    }
 }

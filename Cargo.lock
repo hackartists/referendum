@@ -934,13 +934,14 @@ checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
 name = "by-axum"
-version = "0.2.9"
+version = "0.2.10"
 dependencies = [
  "aide",
  "axum 0.8.1",
  "by-types",
  "dioxus-aws",
  "http 1.2.0",
+ "jsonwebtoken",
  "lambda_http 0.13.0",
  "lambda_runtime 0.13.0",
  "rest-api",
@@ -972,7 +973,7 @@ dependencies = [
 
 [[package]]
 name = "by-macros"
-version = "0.6.3"
+version = "0.6.4"
 dependencies = [
  "convert_case 0.7.1",
  "indexmap 2.7.1",
@@ -988,7 +989,7 @@ dependencies = [
 
 [[package]]
 name = "by-types"
-version = "0.3.4"
+version = "0.3.5"
 dependencies = [
  "aide",
  "axum 0.8.1",
@@ -5369,7 +5370,7 @@ dependencies = [
 
 [[package]]
 name = "rest-api"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "base64 0.22.1",
  "candid",

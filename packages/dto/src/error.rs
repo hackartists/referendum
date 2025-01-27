@@ -31,6 +31,8 @@ pub enum ServiceError {
     Unauthorized,
     NoIdToken(String),
     UserAlreadyExists,
+    RoleConversionException,
+    GenerateJwtException,
 
     VerifyException(String),
     SignException,

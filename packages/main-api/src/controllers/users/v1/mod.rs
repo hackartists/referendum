@@ -1,8 +1,6 @@
-use std::time::SystemTime;
-
 use by_axum::{
     aide,
-    auth::Authorization,
+    auth::{generate_jwt, Authorization},
     axum::{
         extract::{Query, State},
         http::HeaderMap,
@@ -11,10 +9,9 @@ use by_axum::{
         Extension, Json,
     },
 };
-use by_types::AuthConfig;
+use by_types::Claims;
 use dto::*;
 use reqwest::header::{self, HeaderValue};
-use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 use tracing::instrument;
 use validator::Validate;
@@ -56,7 +53,6 @@ impl IntoResponse for UserWrapper {
 #[derive(Clone, Debug)]
 pub struct UserControllerV1 {
     users: UserRepository,
-    auth: AuthConfig,
 }
 
 impl UserControllerV1 {
@@ -65,9 +61,7 @@ impl UserControllerV1 {
 
         users.create_table().await?;
 
-        let auth = crate::config::get().auth.clone();
-
-        let ctrl = UserControllerV1 { users, auth };
+        let ctrl = UserControllerV1 { users };
 
         Ok(by_axum::axum::Router::new()
             .route("/", get(Self::read_user).post(Self::act_user))
@@ -112,12 +106,6 @@ impl UserControllerV1 {
 #[derive(serde::Deserialize, Debug)]
 pub struct OpenIdResponse {
     pub sub: String,
-}
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    sub: String,
-    exp: u64,
-    role: UserRole,
 }
 
 impl UserControllerV1 {
@@ -172,35 +160,19 @@ impl UserControllerV1 {
     }
 
     pub fn generate_token(&self, user: &User) -> Result<String> {
-        match &self.auth {
-            &AuthConfig::Jwt {
-                ref expiration,
-                ref secret,
-            } => {
-                let exp = SystemTime::now()
-                    .duration_since(SystemTime::UNIX_EPOCH)?
-                    .as_secs()
-                    + expiration;
-                let claims = Claims {
-                    sub: user.id.to_string(),
-                    exp,
-                    role: user.role.clone(),
-                };
-                let token = match jsonwebtoken::encode(
-                    &jsonwebtoken::Header::default(),
-                    &claims,
-                    &jsonwebtoken::EncodingKey::from_secret(secret.as_ref()),
-                ) {
-                    Ok(token) => token,
-                    Err(err) => {
-                        tracing::error!("Error creating JWT: {}", err);
-                        return Err(ServiceError::Unknown(err.to_string()));
-                    }
-                };
+        let mut claims = Claims {
+            sub: user.id.to_string(),
+            role: (user.role.clone() as i32).try_into().map_err(|e| {
+                tracing::error!("Failed to convert UserRole to Role: {}", e);
+                ServiceError::RoleConversionException
+            })?,
+            ..Claims::default()
+        };
 
-                Ok(token)
-            }
-        }
+        generate_jwt(&mut claims).map_err(|e| {
+            tracing::error!("Failed to generate JWT: {}", e);
+            ServiceError::GenerateJwtException
+        })
     }
 
     #[instrument]

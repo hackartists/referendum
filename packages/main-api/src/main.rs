@@ -1,4 +1,7 @@
-use by_axum::{auth::authorization_middleware, axum::middleware};
+use by_axum::{
+    auth::{authorization_middleware, set_auth_config},
+    axum::middleware,
+};
 use by_types::DatabaseConfig;
 use dto::error::ServiceError;
 use sqlx::postgres::PgPoolOptions;
@@ -8,6 +11,10 @@ mod controllers {
     pub mod users {
         pub mod v1;
     }
+
+    pub mod topics {
+        pub mod v1;
+    }
 }
 
 pub mod config;
@@ -15,6 +22,8 @@ pub mod config;
 #[tokio::main]
 async fn main() -> Result<(), ServiceError> {
     let conf = config::get();
+    set_auth_config(conf.auth.clone());
+
     let _ = tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_file(true)
@@ -37,6 +46,10 @@ async fn main() -> Result<(), ServiceError> {
         .nest(
             "/users/v1",
             controllers::users::v1::UserControllerV1::route(pool.clone()).await?,
+        )
+        .nest(
+            "/topics/v1",
+            controllers::topics::v1::TopicControllerV1::route(pool.clone()).await?,
         )
         .layer(middleware::from_fn(authorization_middleware));
 

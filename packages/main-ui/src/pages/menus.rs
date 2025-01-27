@@ -42,8 +42,22 @@ pub fn MenuItem(#[props(into)] to: NavigationTarget, children: Element) -> Eleme
 
 #[component]
 pub fn ScrollLink(children: Element) -> Element {
+    let nav = use_navigator();
+    let route: Route = use_route();
+
     rsx! {
-        div { class: "hover-effect px-[10px] py-[5px] text-[15px] font-light leading-[22.5px] text-[#adbcd7] hover:text-white hover:bg-[#424563] rounded-full cursor-pointer ",
+        div {
+            class: "hover-effect px-[10px] py-[5px] text-[15px] font-light leading-[22.5px] text-[#adbcd7] hover:text-white hover:bg-[#424563] rounded-full cursor-pointer ",
+            onclick: move |_| {
+                match route {
+                    Route::HomePage { .. } => {}
+                    _ => {
+                        nav.push(Route::HomePage {
+                            lang: Language::default(),
+                        });
+                    }
+                }
+            },
             {children}
 
         }

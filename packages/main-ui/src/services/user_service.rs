@@ -17,7 +17,6 @@ pub struct UserService {
     pub nickname: Signal<String>,
     pub profile_url: Signal<String>,
     pub role: Signal<UserRole>,
-    pub id_token: Signal<Option<String>>,
 }
 
 impl UserService {
@@ -30,9 +29,7 @@ impl UserService {
             nickname: Signal::new("".to_string()),
             profile_url: Signal::new("".to_string()),
             role: Signal::new(UserRole::Guest),
-            id_token: Signal::new(None),
         };
-        rest_api::add_hook(srv);
         use_context_provider(|| srv);
     }
 
@@ -80,7 +77,7 @@ impl UserService {
 
     pub async fn login(&mut self, id_token: String, kakao_id: String) -> UserEvent {
         tracing::debug!("UserService::login");
-        self.id_token.set(Some(id_token));
+        rest_api::add_header("x-id-token".to_string(), id_token);
 
         let cli = (self.cli)();
         match cli.login(kakao_id).await {
@@ -121,7 +118,7 @@ impl UserService {
             }
             Err(e) => {
                 tracing::error!("UserService::signup: error={:?}", e);
-                self.id_token.set(None);
+                rest_api::remove_header("x-id-token");
                 Err(e)?;
             }
         };
@@ -130,14 +127,19 @@ impl UserService {
     }
 }
 
-impl rest_api::RequestHooker for UserService {
-    fn before_request(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
-        let id_token = (self.id_token)();
+// impl rest_api::RequestHooker for UserService {
+//     fn before_request(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
+//         tracing::debug!("UserService::before_request");
+//         let id_token = self.id_token;
+//         tracing::debug!("UserService::before_request: id_token={:?}", id_token);
 
-        if let Some(id_token) = id_token {
-            req.header("x-id-token".to_string(), id_token)
-        } else {
-            req
-        }
-    }
-}
+//         // if !id_token.is_empty() {
+//         //     tracing::debug!("UserService::before_request: id_token={:?}", id_token);
+//         //     req.header("x-id-token".to_string(), id_token)
+//         // } else {
+//         //     tracing::debug!("UserService::before_request: no id_token");
+//         //     req
+//         // }
+//         req
+//     }
+// }
