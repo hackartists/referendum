@@ -1,5 +1,4 @@
 #![allow(unused)]
-use crate::QueryResponse;
 use crate::*;
 use by_macros::api_model;
 

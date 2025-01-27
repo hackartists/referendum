@@ -1,19 +1,45 @@
 use dioxus_translate::*;
 
 translate! {
-    WriteTopicTranslate;
+    NewTopicTranslate;
 
     title: {
-        ko: "CREATION",
-        en: "CREATION",
+        ko: "토픽 생성",
+        en: "Create a topic",
     },
-}
 
-translate! {
-    LegislationSelectorTranslate;
+    topic_title: {
+        ko: "청원 제목",
+        en: "Title",
+    },
 
-    title: {
-        ko: "토픽 생성(1/2) - 법안 선택",
-        en: "Topic creation (1/2) - Select draft legislation",
+    topic_start: {
+        ko: "투표시작일",
+        en: "Start date",
+    },
+
+    topic_end: {
+        ko: "투표종료일",
+        en: "End date",
+    },
+
+    topic_requirement: {
+        ko: "청원 요구인원",
+        en: "Requirement",
+    },
+
+    topic_content: {
+        ko: "청원 내용",
+        en: "Description",
+    },
+
+    cancel: {
+        ko: "취소하기",
+        en: "Cancel",
+    },
+
+    submit: {
+        ko: "생성하기",
+        en: "Create",
     },
 }

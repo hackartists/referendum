@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use by_components::theme::ColorTheme;
 use dioxus::prelude::*;
 
 use crate::{
@@ -7,31 +8,50 @@ use crate::{
 };
 
 #[component]
-pub fn Button(
+pub fn TextButton(
+    children: Element,
+    onclick: EventHandler<Event<MouseData>>,
+    #[props(default = "".to_string())] class: String,
+) -> Element {
+    let color: ColorTheme = use_context();
+    let bg_hover = &color.button.secondary;
+    let text_color = &color.button.secondary;
+    let text_hover = &color.text.primary;
+
+    rsx! {
+        div { class,
+            button {
+                class: "w-full text-[16px] text-[{text_color}] font-bold px-[16px] py-[10px] opacity-70 hover:opacity-100 cursor-pointer rounded-[8px] hover:bg-[{bg_hover}] hover:text-[{text_hover}]",
+                onclick: move |evt| onclick.call(evt),
+                {children}
+            }
+        }
+    }
+}
+
+#[component]
+pub fn PrimaryButton(
     children: Element,
     color: Option<String>,
     background: Option<String>,
     onclick: EventHandler<Event<MouseData>>,
     #[props(default = "".to_string())] class: String,
 ) -> Element {
-    let theme_service: Theme = use_context();
-    let theme = theme_service.get_data();
-    let font_theme = theme_service.get_font_theme();
-
-    let color = match color {
-        Some(c) => c,
-        None => theme.primary00,
+    let color: ColorTheme = use_context();
+    let bg = match background {
+        Some(bg) => bg,
+        None => color.button.primary,
     };
 
+    let hover_color = &color.button.secondary;
+    let text_color = &color.text.primary;
+
     rsx! {
-        div { class: "{class}",
+        div { class,
             button {
-                class: "{font_theme.bold15} px-[16px] py-[10px] opacity-70 hover:opacity-100 cursor-pointer rounded-[8px]",
+                class: "w-full text-[16px] text-[{text_color}] bg-[{bg}] font-bold px-[16px] py-[10px] opacity-70 hover:opacity-100 cursor-pointer rounded-[8px] hover:bg-[{hover_color}]",
                 onclick: move |evt| onclick.call(evt),
-                style: match background {
-                    Some(bg) => format!("background-color: {}; color: {}", bg, color),
-                    None => format!("color: {}", color),
-                },
+                color: color.text.primary,
                 {children}
             }
         }

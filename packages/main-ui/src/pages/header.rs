@@ -6,7 +6,10 @@ use dioxus_translate::*;
 use super::{i18n::HeaderTranslate, menus::Menus, signup_popup::SignupPopup};
 
 use crate::{
-    components::{button::Button, logo::LogoWrapper},
+    components::{
+        button::{PrimaryButton, TextButton},
+        logo::LogoWrapper,
+    },
     services::user_service::UserService,
     theme::Theme,
 };
@@ -52,7 +55,7 @@ pub fn HeaderTails(lang: Language) -> Element {
     rsx! {
         div { class: "flex flex-row gap-[30px] justify-start items-center",
             if let Some((nickname, profile_url)) = user_service.get_user_info() {
-                Button { color: "{theme.primary00}", onclick: logout, "{i18n_header.logout}" }
+                PrimaryButton { color: "{theme.primary00}", onclick: logout, "{i18n_header.logout}" }
                 div { class: "flex flex-row gap-[8px] items-center justify-center",
                     img {
                         class: "w-[24px] h-[24px] object-contain rounded-full",
@@ -61,13 +64,8 @@ pub fn HeaderTails(lang: Language) -> Element {
                     p { class: "{theme.font_theme.exbold15} uppercase", "{nickname}" }
                 }
             } else {
-                Button { color: "{theme.primary00}", onclick, "{i18n_header.login}" }
-                Button {
-                    color: "{theme.primary00}",
-                    background: "{theme.primary06}",
-                    onclick,
-                    "{i18n_header.signup}"
-                }
+                TextButton { onclick, "{i18n_header.login}" }
+                PrimaryButton { onclick, "{i18n_header.signup}" }
             }
         }
     }
