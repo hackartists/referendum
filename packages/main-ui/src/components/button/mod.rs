@@ -108,7 +108,7 @@ pub fn RoundedYesButton(
     rsx! {
         div { class,
             div {
-                class: "w-full flex flex-col items-center justify-center rounded-[{rounded}px] {border_class} py-[8px] hover:bg-black cursor-pointer",
+                class: "w-full max-w-[600px] flex flex-col items-center justify-center rounded-[{rounded}px] {border_class} py-[8px] hover:bg-black cursor-pointer",
                 onclick: move |evt| {
                     if onclick.is_some() {
                         onclick.unwrap().call(evt)
@@ -119,7 +119,9 @@ pub fn RoundedYesButton(
                     hover.set(true)
                 },
                 onmouseleave: move |_| { hover.set(false) },
-                style: "color: {color}; background: {bg}; border-color: {border};",
+                color,
+                background: bg,
+                border_color: border,
                 div { class: "flex items-center justify-center gap-[10px]",
                     span { class: "text-[15px] font-bold", "찬성" }
                     {icon}

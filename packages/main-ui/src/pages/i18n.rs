@@ -21,6 +21,29 @@ translate! {
         ko: "원",
         en: "won",
     },
+
+    period_tooltip: {
+        ko: "투표 기간",
+        en: "Voting period",
+    },
+
+    requirement_tooltip: {
+        ko: "청원 통과 요구 인원",
+        en: "Number of people required to pass the petition",
+    },
+
+    amount_title: {
+        ko: "투자 홍보 후원금",
+        en: "Promotion Investment Fund",
+    }
+    amount_tooltip: {
+        ko: "투자 홍보 후원금은 해당 청원을 많은 사람에게 알리기 위해 사용됩니다.",
+        en: "The promotion investment fund is used to promote the petition to many people.",
+    },
+    remaining_tooltip: {
+        ko: "청원 통과까지 남은 투표 인원",
+        en: "Number of votes remaining until the petition is passed",
+    },
 }
 
 translate! {
