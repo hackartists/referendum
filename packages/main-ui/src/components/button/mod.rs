@@ -106,22 +106,24 @@ pub fn RoundedYesButton(
     };
 
     rsx! {
-        div {
-            class: "flex flex-col items-center justify-center rounded-[{rounded}px] {border_class} py-[8px] {class} hover:bg-black cursor-pointer",
-            onclick: move |evt| {
-                if onclick.is_some() {
-                    onclick.unwrap().call(evt)
+        div { class,
+            div {
+                class: "w-full flex flex-col items-center justify-center rounded-[{rounded}px] {border_class} py-[8px] hover:bg-black cursor-pointer",
+                onclick: move |evt| {
+                    if onclick.is_some() {
+                        onclick.unwrap().call(evt)
+                    }
+                },
+                onmouseenter: move |_| {
+                    tracing::debug!("hover");
+                    hover.set(true)
+                },
+                onmouseleave: move |_| { hover.set(false) },
+                style: "color: {color}; background: {bg}; border-color: {border};",
+                div { class: "flex items-center justify-center gap-[10px]",
+                    span { class: "text-[15px] font-bold", "찬성" }
+                    {icon}
                 }
-            },
-            onmouseenter: move |_| {
-                tracing::debug!("hover");
-                hover.set(true)
-            },
-            onmouseleave: move |_| { hover.set(false) },
-            style: "color: {color}; background: {bg}; border-color: {border};",
-            div { class: "flex items-center justify-center gap-[10px]",
-                span { class: "text-[15px] font-bold", "찬성" }
-                {icon}
             }
         }
     }

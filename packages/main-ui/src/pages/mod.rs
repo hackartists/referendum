@@ -1,5 +1,6 @@
 pub mod _routes;
 pub mod controller;
+mod highlighted_topic_component;
 mod i18n;
 pub mod page;
 mod topics;

@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use by_axum::{
     auth::Authorization,
     axum::{
@@ -12,15 +14,16 @@ use dto::*;
 #[derive(Clone, Debug)]
 pub struct TopicControllerV1 {
     repo: TopicRepository,
+    pool: sqlx::Pool<sqlx::Postgres>,
 }
 
 impl TopicControllerV1 {
     pub async fn route(pool: sqlx::Pool<sqlx::Postgres>) -> Result<by_axum::axum::Router> {
-        let repo = Topic::get_repository(pool);
+        let repo = Topic::get_repository(pool.clone());
 
         repo.create_table().await?;
 
-        let ctrl = TopicControllerV1 { repo };
+        let ctrl = TopicControllerV1 { repo, pool };
 
         Ok(by_axum::axum::Router::new()
             .route("/:id", get(Self::get_topic).post(Self::act_topic_by_id))
@@ -80,14 +83,40 @@ impl TopicControllerV1 {
         State(ctrl): State<TopicControllerV1>,
         Extension(_authz): Extension<Option<Authorization>>,
         Query(param): Query<TopicParam>,
-    ) -> Result<Json<QueryResponse<TopicSummary>>> {
+    ) -> Result<Json<TopicGetResponse>> {
         tracing::debug!("list_topic {:?}", param);
 
         match param {
             TopicParam::Query(q) => {
                 let topics = ctrl.repo.find(&q).await?;
-                Ok(Json(topics))
+                Ok(Json(TopicGetResponse::Query(topics)))
             }
+            TopicParam::Read(action) => ctrl.read_action(action).await,
         }
+    }
+}
+
+impl TopicControllerV1 {
+    async fn read_action(&self, action: TopicReadAction) -> Result<Json<TopicGetResponse>> {
+        tracing::debug!("read_action {:?}", action);
+
+        self.get_topic_for_voting().await
+    }
+
+    async fn get_topic_for_voting(&self) -> Result<Json<TopicGetResponse>> {
+        let now = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+
+        let topic: Topic = sqlx::query("SELECT * FROM topics WHERE started_at > $1")
+            .bind(now)
+            .map(|row: sqlx::postgres::PgRow| row.into())
+            .fetch_one(&self.pool)
+            .await?;
+
+        tracing::debug!("get_topic_for_voting {:?}", topic);
+
+        Ok(Json(TopicGetResponse::Read(topic)))
     }
 }

@@ -2,65 +2,16 @@
 use super::i18n::*;
 use crate::{
     components::{
-        button::{Button, CloseButton, RoundedNoButton, RoundedYesButton},
+        button::{PrimaryButton, RoundedYesButton},
         icon_text::IconText,
         icons,
     },
     theme::Theme,
 };
+use by_components::theme::ColorTheme;
 use dioxus::prelude::*;
 use dioxus_translate::*;
-use dto::TopicSummary;
 use num_format::{Locale, ToFormattedString};
-
-#[component]
-pub fn HighlightedTopics(
-    #[props(default ="highlighted_topics".to_string())] id: String,
-    #[props(default ="".to_string())] class: String,
-
-    topics: Vec<TopicSummary>,
-    onselect: EventHandler<usize>,
-    lang: Language,
-) -> Element {
-    let mut selected = Signal::new(0);
-    let theme: Theme = use_context();
-    let theme_data = theme.get_data();
-
-    rsx! {
-        div { id, class,
-            div { class: "flex flex-col w-full max-w-[1440px]",
-                for (i , topic) in topics.iter().enumerate() {
-                    if i == selected() {
-                        HighlightedTopic {
-                            id: "highlighted-topic-{topic.id.clone()}",
-                            title: topic.title.clone(),
-                            period: topic.period(),
-                            yes: topic.voters,
-                            lang: lang.clone(),
-                        }
-                    }
-                }
-
-                div { class: "flex flex-row w-full items-center justify-center gap-[10px] p-[10px]",
-                    for i in 0..topics.len() {
-                        div {
-                            class: format!(
-                                "h-[8px] transition-all rounded-full cursor-pointer {} bg-[{}] hover:bg-white",
-                                if i == selected() { "w-[90px]" } else { "w-[52px] hover:w-[70px]" },
-                                theme_data.primary06,
-                            ),
-                            onclick: move |_| {
-                                tracing::debug!("selected: {}", i);
-                                selected.set(i);
-                                onselect(i);
-                            },
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 enum DraftChoice {
@@ -72,97 +23,51 @@ enum DraftChoice {
 pub fn HighlightedTopic(
     id: String,
     title: String,
+    content: String,
 
     period: String,
-    yes: u64,
+    yes: i64,
+    requirement: i64,
+    amount: i64,
     lang: Language,
 ) -> Element {
     let theme: Theme = use_context();
     let theme_data = theme.get_data();
     let mut draft_choice = use_signal(|| None);
+    let color: ColorTheme = use_context();
+    let tr: HighlightedTopicTranslate = translate(&lang);
+    let amount = amount.to_formatted_string(&Locale::en);
+
     rsx! {
         div {
             id,
-            class: "w-full grid grid-cols-12 grid-rows-11 gap-x-[20px] max-[800px]:gap-x-[0px] gap-y-[40px] h-[496px] max-[500px]:h-auto relative",
-            div {
-                class: format!(
-                    "transition-all col-start-6 {} col-span-6 row-end-10 flex flex-col justify-start items-start z-[10] gap-[34px]",
-                    match draft_choice() {
-                        Some(_) => "row-start-2 max-[550px]:col-start-2 max-[550px]:col-span-10",
-                        _ => {
-                            "row-start-3 max-[1000px]:ml-[20px] max-[550px]:col-start-2 max-[550px]:col-span-10"
-                        }
-                    },
-                ),
-                if draft_choice().is_some() {
-                    CloseButton {
-                        class: "absolute top-[48px] right-[44px]",
-                        onclick: move |_| {
-                            draft_choice.set(None);
-                        },
+            class: "w-full flex flex-col gap-x-[20px] gap-y-[40px] bg-[{color.card.primary}] rounded-[15px] px-[50px] py-[40px]",
+            div { class: "transition-all flex flex-col justify-start items-start z-[10] gap-[34px]",
+                DescriptionWrapper { title, content, lang }
+                div { class: "flex flex-row gap-[8px]",
+                    div { class: "flex flex-row gap-[4px] text-[14px] font-bold px-[14px] py-[8px] rounded-[8px] bg-[{theme_data.primary06}]",
+                        icons::Clock {}
+                        "{period}"
                     }
-                    DescriptionWrapper { title, lang }
-                    VoteResultHorizontalBars { class: "w-full", yes, no }
-                } else {
-                    ContentWrapper {
-                        title,
-                        description,
-                        period,
-                        donations,
-                        replies,
-                        lang,
+
+                    div { class: "flex flex-row gap-[4px] text-[14px] font-bold px-[14px] py-[8px] rounded-[8px] bg-[{theme_data.primary06}]",
+                        icons::Clock {}
+                        "{requirement} {tr.unit}"
                     }
-                    div { class: "flex flex-row w-full justify-start items-center gap-[17px]",
-                        VoteResultBars { class: "grow", yes, no }
-                        div { class: "max-[550px]:w-[0px] overflow-hidden",
-                            Button {
-                                background: "rgba(130, 143, 165, 0.05)",
-                                onclick: |_| {},
-                                div { class: "flex flex-row items-center justify-center gap-[10px]",
-                                    span { class: "text-[14px] font-bold", "더보기" }
-                                    icons::RightArrow {}
-                                }
-                            }
-                        }
+
+                    div { class: "flex flex-row gap-[4px] text-[14px] font-bold px-[14px] py-[8px] rounded-[8px]",
+                        icons::Money {}
+                        "{amount} {tr.currency}"
                     }
                 }
+                VoteResultHorizontalBars { class: "w-full", yes, requirement }
             }
 
-            div {
-                class: format!(
-                    "transition-all col-start-1 col-span-12 row-start-1 row-span-11 z-[9] flex flex-row gap-[16px] items-end justify-center backdrop-blur-[10px] rounded-[8px] py-[32px] px-[10px] {}",
-                    match draft_choice() {
-                        Some(_) => "",
-                        _ => "min-[550px]:ml-[71px]",
-                    },
-                ),
-                style: "background: {theme_data.primary05};",
-                RoundedYesButton {
-                    class: format!(
-                        "transition-all {}",
-                        match draft_choice() {
-                            Some(DraftChoice::Yes) => "w-[520px]",
-                            Some(DraftChoice::No) => "hidden",
-                            _ => "w-[291px]",
-                        },
-                    ),
-                    onclick: move |_| {
-                        draft_choice.set(Some(DraftChoice::Yes));
-                    },
-                }
-                RoundedNoButton {
-                    class: format!(
-                        "transition-all {}",
-                        match draft_choice() {
-                            Some(DraftChoice::No) => "w-[520px]",
-                            Some(DraftChoice::Yes) => "hidden",
-                            _ => "w-[291px]",
-                        },
-                    ),
-                    onclick: move |_| {
-                        draft_choice.set(Some(DraftChoice::No));
-                    },
-                }
+            RoundedYesButton {
+                class: "transition-all w-[500px]",
+                onclick: move |_| {
+                    draft_choice.set(Some(DraftChoice::Yes));
+                },
             }
         }
     }
@@ -229,10 +134,9 @@ pub fn DonationSelector(
 }
 
 #[component]
-pub fn DescriptionWrapper(title: String, lang: Language) -> Element {
+pub fn DescriptionWrapper(title: String, content: String, lang: Language) -> Element {
     let theme: Theme = use_context();
     let theme_data = theme.get_data();
-    let tr = translate::<DescriptionWrapperTranslate>(&lang);
     rsx! {
         div { class: "flex flex-col gap-[22px] items-start justify-start",
             h1 { class: "text-[28px] font-extrabold tracking-normal line-clamp-1",
@@ -241,7 +145,7 @@ pub fn DescriptionWrapper(title: String, lang: Language) -> Element {
             p {
                 class: "text-[16px] max-w-[674px] font-regular leading-[24px] tracking-[0.5px] line-clamp-4",
                 style: "color: {theme_data.primary00};",
-                dangerous_inner_html: tr.inner_dangerous,
+                "{content}"
             }
         }
     }
@@ -286,48 +190,13 @@ pub fn ContentWrapper(
 }
 
 #[component]
-pub fn VoteResultBars(
-    yes: u64,
-    no: u64,
-    #[props(default = "w-[580px]".to_string())] class: String,
-) -> Element {
-    let sum = yes + no;
-    let yes = (yes as f64 / sum as f64) * 100.0;
-    let no = (no as f64 / sum as f64) * 100.0;
-    let theme_service: Theme = use_context();
-    let theme = theme_service.get_data();
-
-    rsx! {
-        div { class: "flex flex-row justify-around {class}",
-            div { class: "w-[calc(50%-6px)]",
-                div {
-                    class: "relative animate-grow flex flex-row justify-end items-center px-[20px] text-[15px] font-bold w-[calc(50%-6px)] h-[28px] rounded-[6px]",
-                    style: "background: linear-gradient(90deg, {theme.primary05} 0%, rgba(104, 211, 108, 0.5) 100%);",
-                    div { class: "absolute z-[20] h-[22px] w-[22px] right-[2.46px] top-[3px] rounded-[6px] bg-[{theme.active}] opacity-50" }
-                    span { class: "z-[30]", "{yes}%" }
-                }
-            }
-
-            div { class: "relative w-[calc(50%-6px)]",
-                div {
-                    class: "absolute right-[0px] relative animate-grow-to-left flex flex-row justify-start items-center px-[20px] text-[15px] font-bold w-[calc(50%-6px)] h-[28px] rounded-[6px]",
-                    style: "background: linear-gradient(90deg, rgba(255, 90, 93, 0.5) 0%, {theme.primary05} 100%);",
-                    div { class: "absolute z-[20] h-[22px] w-[22px] left-[2.46px] top-[3px] rounded-[6px] bg-[{theme.active01}] opacity-50" }
-                    span { class: "z-[30]", "{no}%" }
-                }
-            }
-        }
-    }
-}
-
-#[component]
 pub fn VoteResultHorizontalBars(
-    yes: u64,
-    requirement: u64,
+    yes: i64,
+    requirement: i64,
     #[props(default = "w-[580px]".to_string())] class: String,
 ) -> Element {
-    // FIXME: calculate by required
-    let yes = 78;
+    let yes = (yes as f32) / (requirement as f32) * 100.0;
+    tracing::debug!("yes =  {} requirement = {}", yes, requirement);
     let theme_service: Theme = use_context();
     let theme = theme_service.get_data();
 
