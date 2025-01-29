@@ -22,6 +22,8 @@ pub fn HighlightedTopic(
     requirement: i64,
     amount: i64,
     lang: Language,
+
+    onsubmit: EventHandler<MouseEvent>,
 ) -> Element {
     let color: ColorTheme = use_context();
     let tr: HighlightedTopicTranslate = translate(&lang);
@@ -29,7 +31,6 @@ pub fn HighlightedTopic(
     let user_service: UserService = use_context();
     let remaining_people = requirement - yes;
 
-    // TODO: Implement the voting
     rsx! {
         div {
             id,
@@ -89,7 +90,7 @@ pub fn HighlightedTopic(
             if user_service.role() != UserRole::Guest {
                 RoundedYesButton {
                     class: "transition-all w-full flex flex-row justify-center items-center px-[10px] mt-[30px]",
-                    onclick: move |_| {},
+                    onclick: onsubmit,
                 }
             }
         }

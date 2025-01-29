@@ -39,7 +39,6 @@ jsonwebtoken = "9.3.0"
 
 [features]
 default = []
-web = ["web-only", "dioxus-aws/web"]
-web-only = ["web-sys", "wasm-bindgen", "wasm-bindgen-futures", "dioxus-aws/web-only", "dioxus-web", "dioxus-sdk", "dioxus-oauth/web", "dioxus-translate/web", "by-components/web", "rest-api/web"]
-server = ["dioxus-aws/server"]
+web = ["dioxus-aws/web", "dioxus/web", "web-sys", "wasm-bindgen", "wasm-bindgen-futures", "dioxus-aws/web-only", "dioxus-web", "dioxus-sdk", "dioxus-oauth/web", "dioxus-translate/web", "by-components/web", "rest-api/web"]
+server = ["dioxus-aws/server", "dioxus/server"]
 lambda = ["server", "dioxus-aws/lambda"]
