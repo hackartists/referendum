@@ -14,22 +14,27 @@ license = "MIT"
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.133"
 slog = "2.7.0"
+easy-dynamodb = { version = "0.1.7" }
+reqwest = { version = "0.12.5", features = ["blocking", "json", "multipart"] }
+dioxus = { version = "0.6.2" }
+sqlx = { version = "0.8.3", features = ["sqlite", "postgres", "runtime-tokio", "time"] }
+dioxus-web = { version = "0.6.2", features = [] }
+dioxus-sdk = { version = "0.6.0", features = ["window_size"] }
+
+# project crates
+dto = { path = "./packages/dto" }
+
+# biyard rust-sdk
 by-axum = { path = "./deps/rust-sdk/packages/by-axum" }
 by-macros = { path = "./deps/rust-sdk/packages/by-macros" }
 by-types = { path = "./deps/rust-sdk/packages/by-types" }
 rest-api = { path = "./deps/rust-sdk/packages/rest-api" }
-easy-dynamodb = { version = "0.1.7" }
-dto = { path = "./packages/dto" }
-reqwest = { version = "0.12.5", features = ["blocking", "json", "multipart"] }
-dioxus = { version = "0.6.2" }
-sqlx = { version = "0.8.3", features = ["sqlite", "postgres", "runtime-tokio", "time"] }
 dioxus-translate = { path = "./deps/rust-sdk/packages/dioxus-translate", features = ["ko"] }
 dioxus-oauth = { path = "./deps/rust-sdk/packages/dioxus-oauth" }
 google-wallet = { path = "./deps/rust-sdk/packages/google-wallet" }
 dioxus-popup = { path = "./deps/rust-sdk/packages/dioxus-popup" }
 by-components = { path = "./deps/rust-sdk/packages/by-components" }
-dioxus-web = { version = "0.6.2", features = [] }
-dioxus-sdk = { version = "0.6.0", features = ["window_size"] }
+dioxus-aws = { path = "deps/rust-sdk/packages/dioxus-aws" }
 
 
 [profile.wasm-dev]
