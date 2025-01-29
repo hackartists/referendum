@@ -1,20 +1,26 @@
 #![allow(non_snake_case)]
+use by_components::theme::ColorTheme;
 use dioxus::prelude::*;
 use dioxus_popup::PopupZone;
 use dioxus_translate::*;
 
 use super::header::Header;
-use crate::{route::Route, theme::Theme};
+use crate::route::Route;
 
 #[component]
 pub fn RootLayout(lang: Language) -> Element {
-    let theme: Theme = use_context();
-    let theme = theme.get_data();
+    let color: ColorTheme = use_context();
+    let route = use_route::<Route>();
+
+    use_effect(move || {
+        tracing::debug!("use_effect route: {:?}", route);
+    });
 
     rsx! {
         div {
-            class: "flex flex-col items-center justify-start w-full min-h-[100vh] text-white max-[1440px]:px-[10px]",
-            style: "background: {theme.background}",
+            class: "flex flex-col items-center justify-start w-full min-h-[100vh] max-[1440px]:px-[10px]",
+            background: color.background,
+            color: color.text.primary,
             div { class: "max-w-[1440px] w-full ",
                 Header { lang }
             }
