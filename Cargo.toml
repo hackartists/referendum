@@ -21,13 +21,15 @@ rest-api = { path = "./deps/rust-sdk/packages/rest-api" }
 easy-dynamodb = { version = "0.1.7" }
 dto = { path = "./packages/dto" }
 reqwest = { version = "0.12.5", features = ["blocking", "json", "multipart"] }
-dioxus = { version = "0.6.1" }
+dioxus = { version = "0.6.2" }
 sqlx = { version = "0.8.3", features = ["sqlite", "postgres", "runtime-tokio", "time"] }
 dioxus-translate = { path = "./deps/rust-sdk/packages/dioxus-translate", features = ["ko"] }
 dioxus-oauth = { path = "./deps/rust-sdk/packages/dioxus-oauth" }
 google-wallet = { path = "./deps/rust-sdk/packages/google-wallet" }
 dioxus-popup = { path = "./deps/rust-sdk/packages/dioxus-popup" }
 by-components = { path = "./deps/rust-sdk/packages/by-components" }
+dioxus-web = { version = "0.6.2", features = [] }
+dioxus-sdk = { version = "0.6.0", features = ["window_size"] }
 
 
 [profile.wasm-dev]
