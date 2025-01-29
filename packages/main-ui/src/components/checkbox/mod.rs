@@ -1,9 +1,24 @@
 #![allow(non_snake_case)]
+use by_components::theme::ColorTheme;
 use dioxus::prelude::*;
-use crate::theme::Theme;
 
 #[component]
-pub fn Checkbox(
+pub fn Checkbox(onchange: EventHandler<bool>) -> Element {
+    let mut checked = use_signal(|| false);
+
+    rsx! {
+        div {
+            onclick: move |_| {
+                checked.set(!checked());
+                onchange(checked());
+            },
+            CheckboxIcon { checked: checked() }
+        }
+    }
+}
+
+#[component]
+pub fn CheckboxWithText(
     #[props(default ="".to_string())] class: String,
     title: String,
     onchange: EventHandler<bool>,
@@ -19,7 +34,9 @@ pub fn Checkbox(
             },
             div { class: "flex flex-row items-start justify-start gap-[6px] cursor-pointer",
                 CheckboxIcon { checked: checked() }
-                span { class: "w-full text-[16px] font-normal leading-[24px] text-white", "{title}" }
+                span { class: "w-full text-[16px] font-normal leading-[24px] text-white",
+                    "{title}"
+                }
             }
         }
     }
@@ -27,11 +44,10 @@ pub fn Checkbox(
 
 #[component]
 pub fn CheckboxIcon(checked: bool) -> Element {
-    let theme_service: Theme = use_context();
-    let theme = theme_service.get_data();
+    let color: ColorTheme = use_context();
 
     rsx! {
-        div { class: "w-[28px] h-[28px] flex items-center justify-center",
+        div { class: "w-[28px] h-[28px] flex items-center justify-center cursor-pointer hover-effect",
             svg {
                 width: "24",
                 height: "24",
@@ -41,15 +57,13 @@ pub fn CheckboxIcon(checked: bool) -> Element {
 
                 path {
                     d: "M10.8333 22.5H13.1667C16.4336 22.5 18.0671 22.5 19.3149 21.8642C20.4126 21.3049 21.3049 20.4126 21.8642 19.3149C22.5 18.0671 22.5 16.4336 22.5 13.1667V10.8333C22.5 7.56636 22.5 5.93287 21.8642 4.68505C21.3049 3.58744 20.4126 2.69506 19.3149 2.13579C18.0671 1.5 16.4336 1.5 13.1667 1.5L10.8333 1.5C7.56636 1.5 5.93287 1.5 4.68505 2.13579C3.58744 2.69506 2.69506 3.58744 2.1358 4.68505C1.5 5.93287 1.5 7.56636 1.5 10.8333L1.5 13.1667C1.5 16.4336 1.5 18.0671 2.1358 19.3149C2.69506 20.4126 3.58744 21.3049 4.68505 21.8642C5.93287 22.5 7.56636 22.5 10.8333 22.5Z",
-                    fill: "{theme.background}",
+                    fill: "{color.input.primary}",
                 }
 
                 // Checkmark Path
-                if checked {
-                    path {
-                        d: "M15.5 9.66667L10.8333 14.3333L8.5 12",
-                        fill: "{theme.background}",
-                    }
+                path {
+                    d: "M15.5 9.66667L10.8333 14.3333L8.5 12",
+                    fill: "{color.input.primary}",
                 }
 
                 if checked {

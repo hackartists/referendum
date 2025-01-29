@@ -45,14 +45,14 @@ fn app() -> Element {
         document::Link { id: "favicon", rel: "icon", href: asset!("/public/favicon.ico") }
         document::Link { rel: "stylesheet", href: asset!("/public/main.css") }
         document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css") }
-        Header {}
+        ImportDevScript {}
         HoverEffects {}
 
         Router::<Route> {}
     }
 }
 #[component]
-pub fn Header() -> Element {
+pub fn ImportDevScript() -> Element {
     rsx! {
         div {
             document::Link {

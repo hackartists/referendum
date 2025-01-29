@@ -5,7 +5,9 @@ use dioxus_translate::*;
 use dto::ServiceError;
 
 use super::{congratulation_popup::CongratulationPopup, i18n::UserSetupPopupTranslate};
-use crate::{components::checkbox::Checkbox, services::user_service::UserService, theme::Theme};
+use crate::{
+    components::checkbox::CheckboxWithText, services::user_service::UserService, theme::Theme,
+};
 
 #[component]
 pub fn UserSetupPopup(
@@ -88,7 +90,7 @@ pub fn UserSetupPopup(
 
 
                 div { class: "flex flex-row gap-[10px] items-center",
-                    Checkbox {
+                    CheckboxWithText {
                         title: "{tr.agree_email}",
                         onchange: move |check| {
                             agreed.set(check);

@@ -33,8 +33,8 @@ translate! {
     },
 
     amount_title: {
-        ko: "투자 홍보 후원금",
-        en: "Promotion Investment Fund",
+        ko: "투표 홍보 후원금",
+        en: "Promotion investment fund",
     }
     amount_tooltip: {
         ko: "투자 홍보 후원금은 해당 청원을 많은 사람에게 알리기 위해 사용됩니다.",
@@ -150,4 +150,63 @@ translate! {
         ko: "TOPIC",
         en: "TOPIC",
     },
+}
+
+translate! {
+    VotingPopupTranslate;
+
+    title: {
+        ko: "청원 지지하기",
+        en: "Support the petition",
+    },
+
+    agreement: {
+        ko: "(선택) 해당 청원을 홍보하기 위한 후원금을 지원하겠습니까?",
+        en: "(Optional) Would you like to support the petition with a donation to promote it?",
+    },
+
+    label_title: {
+        ko: "청원주제",
+        en: "Petition title",
+    },
+    label_amount: {
+        ko: "후원금액",
+        en: "Donation",
+    },
+
+    label_name: {
+        ko: "입금자명",
+        en: "Donor name",
+    },
+
+    placeholder_name: {
+        ko: "이체시 받으실 분에 보여지는 이름을 입력해주세요.",
+        en: "Please enter the name that will be shown to the recipient when transferring.",
+    },
+
+    notice: {
+        ko: "홍보후원금은 아래의 계좌로 입금해주세요.",
+        en: "Please transfer the promotion donation to the account below.",
+    },
+
+    account_info: {
+        ko: "계좌번호: OO은행 / XXX-XXX-XXXXXX",
+        en: "Account number: OO Bank / XXX-XXX-XXXXXX",
+    },
+
+    account_owner: {
+        ko: "예금주: OO",
+        en: "Account owner: OO",
+    },
+
+    update: {
+        ko: "홍보후원금액은 OO시에 업데이트 됩니다.",
+        en: "The promotion donation amount will be updated at OO.",
+    },
+
+    support: {
+        ko: "지지하기",
+        en: "Support",
+    },
+
 }
