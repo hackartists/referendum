@@ -4,6 +4,7 @@ mod highlighted_topic_component;
 mod i18n;
 pub mod page;
 mod topics;
+mod voting_popup;
 
 pub use _routes::*;
 pub use layout::*;

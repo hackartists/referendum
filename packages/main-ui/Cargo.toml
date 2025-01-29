@@ -12,7 +12,7 @@ dto.workspace = true
 dioxus = { workspace = true, features = ["router"] }
 
 dioxus-aws = { version = "0.6.15" }
-dioxus-web = { version = "0.6.1", features = [], optional = true }
+dioxus-web = { workspace = true, optional = true }
 dioxus-logger = { version = "0.5.0" }
 tracing = { version = "0.1.40" }
 
@@ -22,7 +22,7 @@ web-sys = { version = "0.3.72", features=["Navigator", "HtmlCollection"], option
 serde = "1.0.216"
 num-format = "0.4.4"
 
-dioxus-sdk = { version = "0.6.0", features = ["window_size"], optional = true }
+dioxus-sdk = { workspace = true, optional = true }
 
 dioxus-popup.workspace = true
 dioxus-translate.workspace = true

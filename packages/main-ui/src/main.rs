@@ -12,8 +12,6 @@ use route::Route;
 use services::user_service::UserService;
 use theme::Theme;
 
-static mut APP: Option<fn() -> Element> = None;
-
 fn main() {
     let conf = config::get();
     dioxus_logger::init(conf.log_level).expect("failed to init logger");
@@ -45,14 +43,22 @@ fn app() -> Element {
         document::Link { id: "favicon", rel: "icon", href: asset!("/public/favicon.ico") }
         document::Link { rel: "stylesheet", href: asset!("/public/main.css") }
         document::Link { rel: "stylesheet", href: asset!("/public/tailwind.css") }
-        document::Link {
-            rel: "stylesheet",
-            href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css",
-        }
-        document::Script { src: "https://cdn.tailwindcss.com/3.4.16" }
+        ImportDevScript {}
         HoverEffects {}
 
         Router::<Route> {}
+    }
+}
+#[component]
+pub fn ImportDevScript() -> Element {
+    rsx! {
+        div {
+            document::Link {
+                rel: "stylesheet",
+                href: "https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css",
+            }
+            document::Script { src: "https://cdn.tailwindcss.com" }
+        }
     }
 }
 

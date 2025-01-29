@@ -1,4 +1,6 @@
 use dioxus_aws::prelude::*;
+use dioxus_popup::PopupService;
+use dioxus_translate::Language;
 use dto::*;
 
 use crate::config;
@@ -6,13 +8,15 @@ use crate::config;
 #[derive(Debug, Clone, Copy)]
 pub struct Controller {
     pub topic: Resource<Topic>,
+    pub popup: PopupService,
 }
 
 impl Controller {
-    pub fn new() -> std::result::Result<Self, RenderError> {
+    pub fn new(_lang: Language) -> std::result::Result<Self, RenderError> {
         let conf = config::get();
 
         let ctrl = Self {
+            popup: use_context(),
             topic: use_server_future(move || async move {
                 let cli = Topic::get_client(&conf.main_api_endpoint);
                 match cli.get_topic().await {

@@ -9,7 +9,7 @@
 
 
 ## Development
-### Running API Server
+### Running API Server(main-api)
 - It runs `SERVICE` crate.
   - Default `SERVICE` is `main-ui`.
 
@@ -19,7 +19,7 @@ export OPENAPI_KEY=`your openapi key`
 make run
 ```
 
-### Running Web UI
+### Running Web UI(main-ui)
 - It will interact with API server in `dev` environment.
   - If you want to change it, set `MAIN_API_ENDPOINT` environment.
 - Before running UI, set up firebase configuration

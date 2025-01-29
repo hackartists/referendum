@@ -7,7 +7,7 @@ use dioxus_translate::{translate, Language};
 
 #[component]
 pub fn HomePage(lang: Language) -> Element {
-    let ctrl = super::controller::Controller::new()?;
+    let ctrl = super::controller::Controller::new(lang)?;
     let _tr: PagesTranslate = translate(&lang);
 
     rsx! {
