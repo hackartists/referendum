@@ -11,12 +11,6 @@ use dioxus_translate::*;
 use dto::UserRole;
 use num_format::{Locale, ToFormattedString};
 
-#[derive(Debug, Clone)]
-enum DraftChoice {
-    Yes,
-    No,
-}
-
 #[component]
 pub fn HighlightedTopic(
     id: String,

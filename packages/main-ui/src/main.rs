@@ -12,8 +12,6 @@ use route::Route;
 use services::user_service::UserService;
 use theme::Theme;
 
-static mut APP: Option<fn() -> Element> = None;
-
 fn main() {
     let conf = config::get();
     dioxus_logger::init(conf.log_level).expect("failed to init logger");
