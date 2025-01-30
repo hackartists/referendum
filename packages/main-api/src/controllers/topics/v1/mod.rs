@@ -1,3 +1,5 @@
+pub mod votes;
+
 use std::time::SystemTime;
 
 use by_axum::{
@@ -10,6 +12,7 @@ use by_axum::{
 };
 use by_types::Role;
 use dto::*;
+use votes::VoteControllerV1;
 
 #[derive(Clone, Debug)]
 pub struct TopicControllerV1 {
@@ -23,13 +26,17 @@ impl TopicControllerV1 {
 
         repo.create_table().await?;
 
-        let ctrl = TopicControllerV1 { repo, pool };
+        let ctrl = TopicControllerV1 {
+            repo,
+            pool: pool.clone(),
+        };
 
         Ok(by_axum::axum::Router::new()
             .route("/:id", get(Self::get_topic).post(Self::act_topic_by_id))
             .with_state(ctrl.clone())
             .route("/", post(Self::act_topic).get(Self::list_topic))
-            .with_state(ctrl.clone()))
+            .with_state(ctrl.clone())
+            .nest("/:id/votes", VoteControllerV1::route(pool.clone()).await?))
     }
 
     pub async fn act_topic(

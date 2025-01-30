@@ -18,7 +18,7 @@ fn main() {
     tracing::debug!("config: {:?}", conf);
     rest_api::set_message(conf.domain.to_string());
 
-    dioxus_aws::launch(app);
+    dioxus::launch(app);
 }
 
 fn app() -> Element {

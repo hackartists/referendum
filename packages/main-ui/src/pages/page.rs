@@ -7,7 +7,7 @@ use dioxus_translate::{translate, Language};
 
 #[component]
 pub fn HomePage(lang: Language) -> Element {
-    let ctrl = super::controller::Controller::new(lang)?;
+    let mut ctrl = super::controller::Controller::new(lang)?;
     let _tr: PagesTranslate = translate(&lang);
 
     rsx! {
@@ -22,6 +22,7 @@ pub fn HomePage(lang: Language) -> Element {
                     requirement: topic.requirement,
                     amount: 10000000,
                     lang,
+                    onsubmit: move |_| ctrl.handle_vote(),
                 }
             }
         }

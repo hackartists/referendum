@@ -48,7 +48,7 @@ pub fn VotingPopup(
                     LabeledInput {
                         title: "{tr.label_amount}",
                         oninput: move |e: String| {
-                            amount.set(e.replace(",", "").parse::<i32>().unwrap_or(0));
+                            amount.set(e.replace(",", "").parse::<i64>().unwrap_or(0));
                         },
                         value: amount().to_formatted_string(&Locale::en),
                         required: true,
@@ -78,7 +78,18 @@ pub fn VotingPopup(
 
             }
 
-            PrimaryButton { class: "w-full", onclick: |_| {}, "{tr.support}" }
+            PrimaryButton {
+                class: "w-full",
+                onclick: move |_| {
+                    let donation = match checked() {
+                        true => Some((amount(), name())),
+                        false => None,
+                    };
+                    tracing::debug!("{:?}", donation);
+                    popup.close();
+                },
+                "{tr.support}"
+            }
         }
     }
 }
