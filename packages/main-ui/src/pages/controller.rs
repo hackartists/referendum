@@ -1,3 +1,4 @@
+use dioxus::CapturedError;
 use dioxus_aws::prelude::*;
 use dioxus_popup::PopupService;
 use dioxus_translate::Language;
@@ -44,7 +45,13 @@ impl Controller {
     }
 
     pub fn handle_vote(&mut self) {
-        let topic = self.topic().unwrap_or_default();
+        let topic = match self.topic() {
+            Some(topic) => topic,
+            None => {
+                tracing::error!("No topic found");
+                return;
+            }
+        };
 
         self.popup.open(rsx! {
             VotingPopup {

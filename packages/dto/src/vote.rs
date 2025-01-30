@@ -16,8 +16,14 @@ pub struct Vote {
     #[api_model(many_to_one = topics)]
     pub topic_id: String,
 
+    #[api_model(many_to_one = users)]
+    pub user_id: String,
+
     #[api_model(summary, action = support)]
     pub amount: i64,
+
+    #[api_model(summary, action = support)]
+    pub name: String,
 
     #[api_model(action_by_id = confirm)]
     pub confirmed: Option<bool>,
